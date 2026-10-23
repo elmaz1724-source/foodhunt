@@ -40,3 +40,20 @@
 }
 @media(max-width:380px){.nav-link{font-size:9px}.nav-link span{font-size:20px}}
 @media(display-mode:standalone){.topbar{padding-top:env(safe-area-inset-top)}.modal{max-height:calc(100dvh - 35px)}}
+
+/* FOODHUNT locations – Google Maps search on every card, no API key */
+.spot-card-main{display:flex;flex-direction:column;flex:1;align-items:stretch;min-width:0;width:100%;border:0;padding:0;background:transparent;color:inherit;text-align:left;cursor:pointer}
+.spot-card-main:focus-visible{outline:2px solid var(--lime);outline-offset:5px;border-radius:5px}
+.spot-card-main h3{overflow-wrap:anywhere}
+.spot-map-link{display:flex;align-items:center;justify-content:space-between;gap:7px;color:#d6f3a2;border-top:1px solid #343f32;padding:12px 2px 0;margin-top:12px;font-size:11px;font-weight:800;letter-spacing:.05px;min-height:34px;transition:color .2s}
+.spot-map-link:hover,.spot-map-link:focus-visible{color:#f1ffc8;text-decoration:underline}
+.spot-map-icon{font-size:18px;line-height:1;flex-shrink:0;color:var(--lime)}
+.spot-location-box{background:#253322;border:1px solid #42573a;border-radius:12px;padding:14px;display:grid;gap:10px}
+.spot-location-heading{color:#d9f8ac;font-size:10px;letter-spacing:1px;font-weight:800}
+.spot-location-actions{display:flex;gap:8px;flex-wrap:wrap}
+.spot-maps-button,.spot-directions-button{display:inline-flex;align-items:center;justify-content:center;padding:12px 14px;border-radius:8px;font-weight:800;font-size:12px;text-align:center;min-height:43px}
+.spot-maps-button{background:var(--lime);color:#182014;flex:1}
+.spot-directions-button{background:#364831;border:1px solid #5b794b;color:#e1f8cd;flex:1}
+.spot-maps-button:hover{background:#e5ffaf}.spot-directions-button:hover{background:#415b38}
+.spot-maps-hint{color:#aebeaa;font-size:11px;line-height:1.5;margin:0}
+@media(max-width:440px){.spot-card{min-height:182px}.spot-map-link{font-size:9px;letter-spacing:0;gap:3px}.spot-map-icon{font-size:15px}}
