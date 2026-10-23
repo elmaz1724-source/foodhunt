@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta name="theme-color" content="#11120f" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="FOODHUNT" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <link rel="manifest" href="manifest.json" />
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png" />
+  <meta name="description" content="Dein persönlicher Hamburg Food Guide – 93 Spots, Rankings und Reviews. Entdecke. Bewerte. Wiederhole." />
+  <title>FOODHUNT. — Dein Hamburg Food Guide</title>
+  <link rel="icon" type="image/svg+xml" href="favicon.svg" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+  <script defer src="seed.js"></script>
+  <script defer src="app.js"></script>
+  <script>
+    if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.hostname === 'localhost')) {
+      window.addEventListener('load', () => navigator.serviceWorker.register('./sw.js').catch(() => {}));
+    }
+  </script>
+</head>
+<body>
+<div class="app-shell">
+  <aside class="sidebar">
+    <a class="logo" href="#home" aria-label="Foodhunt Startseite">FOOD<span>HUNT.</span><span class="logo-star">✳</span></a>
+    <div class="side-note">THE GOOD FOOD ARCHIVE<br /><span>HAMBURG · EST. 2026</span></div>
+    <div class="side-section-label">DEIN SPACE</div>
+    <nav class="main-nav" aria-label="Hauptnavigation">
+      <button class="nav-link selected" data-view="home"><span>▦</span> Übersicht</button>
+      <button class="nav-link" data-view="discover"><span>◈</span> Entdecken</button>
+      <button class="nav-link" data-view="rankings"><span>★</span> Rankings</button>
+      <button class="nav-link" data-view="visited"><span>✓</span> Getestet</button>
+      <button class="nav-link mobile-backup" id="navBackup" type="button"><span>⇩</span> Backup</button>
+    </nav>
+    <div class="side-section-label side-category-label">KATEGORIEN <button id="quickCategory" title="Kategorie hinzufügen" aria-label="Kategorie hinzufügen">＋</button></div>
+    <div id="sidebarCategories" class="sidebar-categories"></div>
+    <div class="sidebar-bottom">
+      <div class="sidebar-promo"><span class="promo-badge">🍟 FOOD MISSION</span><strong>Good food.<br>Better memories.</strong><small>Dein persönlicher Taste-Tracker.</small></div>
+      <button class="side-backup" id="backupButton">⇩ &nbsp;Daten sichern / laden</button>
+    </div>
+  </aside>
+  <main id="home" class="content">
+    <header class="topbar">
+      <div class="location"><span class="live-dot"></span> HAMBURG <span class="location-muted">/ DEIN FOOD GUIDE</span></div>
+      <div class="top-actions"><span class="today-date" id="todayDate"></span><button class="add-button" id="addSpotTop"><span>＋</span> Spot hinzufügen</button></div>
+    </header>
+    <section class="hero" id="hero">
+      <div class="hero-copy">
+        <div class="eyebrow">✳ &nbsp; YOUR PERSONAL FOOD GUIDE — VOL. 01</div>
+        <h1>GOOD FOOD.<br><span>NO BAD</span><br>DECISIONS<span class="period">.</span></h1>
+        <p>Alle Spots, die du probieren willst. Deine Bewertungen. Deine Favorites. Ein Guide, der mit deinem Hunger wächst.</p>
+        <div class="hero-buttons"><button class="button-dark" id="exploreButton">Spots entdecken <span>↗</span></button><button class="button-text" id="surpriseButton">Überrasch mich ↗</button></div>
+        <div class="hero-scribble">EAT. RATE. REPEAT. ↗</div>
+      </div>
+      <div class="hero-photo" role="img" aria-label="Food Fotografie von einem Burger">
+        <div class="hero-fallback" aria-hidden="true">🍔</div><img class="hero-real-photo" src="https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=1100&amp;q=85&amp;fit=crop" alt="" onerror="this.style.display='none'" /><div class="hero-photo-shade"></div><span class="hero-photo-tag">HAMBURG'S<br><strong>FOOD<br>SCENE</strong></span><span class="hero-photo-label">CURATED WITH APPETITE ✳</span>
+      </div>
+    </section>
+    <section class="stat-grid" aria-label="Deine Statistik">
+      <div class="stat-card"><div class="stat-top">GESAMTE SPOTS <span>↗</span></div><div class="stat-value" id="spotCount">93</div><div class="stat-bottom">Deine Food Bucket List</div></div>
+      <div class="stat-card"><div class="stat-top">BEREITS GETESTET <span>◉</span></div><div class="stat-value" id="visitedCount">4<span class="stat-unit"> / 93</span></div><div class="stat-bottom" id="progressLabel">4,3% deiner Liste</div><div class="stat-progress"><span id="progressBar"></span></div></div>
+      <div class="stat-card"><div class="stat-top">FOOD-KATEGORIEN <span>✳</span></div><div class="stat-value" id="categoryCount">13</div><div class="stat-bottom">Von Burger bis Brunch</div></div>
+    </section>
+    <section class="categories-section" id="categorySection"><div class="section-header"><div><div class="overline">01 / EXPLORE THE FLAVORS</div><h2>Worauf hast du <em>Hunger?</em></h2></div><button class="plain-link" id="addCategoryButton">＋ Kategorie erstellen</button></div><div id="categoryTiles" class="category-tiles"></div></section>
+    <section class="rankings-section" id="rankingSection"><div class="section-header"><div><div class="overline">02 / THE LEADERBOARD</div><h2>Die <em>Besten.</em></h2></div><div class="legend">★ Deine persönlichen Bewertungen</div></div><div id="topRated" class="ranking-grid"></div></section>
+    <section class="browse-section" id="browseSection"><div class="section-header browse-title"><div><div class="overline">03 / THE COMPLETE COLLECTION</div><h2>Die <em>Bucket List.</em></h2></div><button class="plain-link" id="addSpotSection">＋ Neuen Spot eintragen</button></div>
+      <div class="browse-controls"><label class="search-field"><span>⌕</span><input id="searchInput" placeholder="Suche nach einem Food-Spot ..." autocomplete="off" /></label><select id="sortSelect" aria-label="Sortieren"><option value="default">Standardsortierung</option><option value="name">Name A–Z</option><option value="rating">Beste Bewertung</option><option value="new">Neueste zuerst</option></select></div>
+      <div class="filter-row" id="quickFilters"><button class="filter-pill active" data-filter="all">Alle Spots</button><button class="filter-pill" data-filter="unvisited">Noch offen</button><button class="filter-pill" data-filter="visited">Getestet ✓</button><button class="filter-pill" data-filter="suggested">Neue Vorschläge ✳</button><button class="filter-pill" data-filter="favorite">Favoriten ♡</button></div>
+      <div class="result-count"><span id="resultsLabel">93 SPOTS ENTDECKEN</span><span id="categoryFilterName">ALLE KATEGORIEN</span></div><div class="spot-grid" id="spotGrid"></div><div class="empty-state hidden" id="emptyState"><span>🍽️</span><strong>Hier ist noch Platz für guten Geschmack.</strong><p>Kein Spot gefunden. Ändere die Filter oder füge einen neuen hinzu.</p><button id="emptyAdd">＋ Spot hinzufügen</button></div>
+    </section>
+    <footer>FOOD<span>HUNT.</span><span>HAMBURG FOOD ARCHIVE · BUILT FOR THE NEXT BITE · 2026</span><span>MADE WITH HUNGER ✳</span></footer>
+  </main>
+</div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+<div class="modal-backdrop hidden" id="modalBackdrop" role="presentation">
+ <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle"><div class="modal-head"><div><div class="overline">YOUR FOOD ARCHIVE</div><h3 id="modalTitle">Spot hinzufügen</h3></div><button id="closeModal" class="icon-button" aria-label="Schließen">✕</button></div>
+  <form id="spotForm" class="modal-form"><input type="hidden" id="spotId" /><label>NAME DES SPOTS <input id="spotName" required maxlength="100" placeholder="z. B. Neuer Lieblingsburger" /></label><label>KATEGORIE <select id="spotCategory" required></select></label>
+   <div class="field-pair"><label>STATUS <select id="spotVisited"><option value="false">Noch auf der Liste</option><option value="true">Bereits getestet</option></select></label><label>DEINE BEWERTUNG <input id="spotScore" type="number" min="0" max="10" step="0.1" placeholder="z. B. 8.7" /></label></div>
+   <label>WAS HAST DU GEGESSEN? <input id="spotDish" maxlength="120" placeholder="z. B. Double Smash Burger" /></label><label>DEINE NOTIZEN <textarea id="spotNote" maxlength="1200" rows="3" placeholder="Geschmack, Preis-Leistung, Atmosphäre ..."></textarea></label>
+   <label class="check-row"><input id="spotFavorite" type="checkbox" /> ♡ Als Favorit markieren</label>
+   <div class="modal-footer"><button type="button" id="deleteSpot" class="delete-button hidden">Spot löschen</button><button type="submit" class="save-button">Speichern ↗</button></div>
+  </form>
+  <form id="categoryForm" class="modal-form hidden"><label>NAME DER KATEGORIE <input id="newCategoryName" maxlength="40" placeholder="z. B. Türkische Desserts" /></label><label>EMOJI <input id="newCategoryEmoji" maxlength="8" value="🍽️" /></label><div class="modal-footer"><button type="submit" class="save-button">Kategorie erstellen ↗</button></div></form>
+  <div class="backup-panel hidden" id="backupPanel"><p>Deine Änderungen werden auf diesem Gerät gespeichert. Sichere sie als JSON-Datei, um sie auf andere Geräte zu übertragen.</p><button id="exportData" class="backup-action">↓ Daten als JSON herunterladen</button><label class="backup-action import-label">↑ JSON-Backup importieren <input type="file" id="importData" accept="application/json,.json" hidden /></label><small>Hinweis: Beim Import wird dein aktueller Stand durch die Sicherungsdatei ersetzt.</small></div>
+ </div>
+</div>
+</body>
+</html>
