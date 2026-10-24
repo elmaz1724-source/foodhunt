@@ -23,10 +23,12 @@
   <link rel="stylesheet" href="v5.css" />
   <link rel="stylesheet" href="v6.css" />
   <link rel="stylesheet" href="v7.css" />
+  <link rel="stylesheet" href="v8.css" />
   <script defer src="seed.js"></script>
   <script defer src="app.js"></script>
   <script defer src="theme.js"></script>
   <script defer src="v7.js"></script>
+  <script defer src="v8.js"></script>
   <script>
     if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.hostname === 'localhost')) {
       window.addEventListener('load', () => navigator.serviceWorker.register('./sw.js').catch(() => {}));
@@ -94,13 +96,53 @@
 <nav class="mobile-bottom-nav" aria-label="Mobile Navigation"><button class="mobile-nav-link selected" data-view="home" type="button"><span class="mobile-nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="m3 10 9-7 9 7v10a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1Z"/></svg></span>Home</button><button class="mobile-nav-link" data-view="discover" type="button"><span class="mobile-nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m16 16 5 5"/></svg></span>Entdecken</button><button class="mobile-nav-link" data-view="rankings" type="button"><span class="mobile-nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="m12 2 3.2 6.5 7.2 1-5.2 5 .95 7.1L12 18.2 5.85 21.6l.95-7.1-5.2-5 7.2-1Z"/></svg></span>Rankings</button><button class="mobile-nav-link" data-view="visited" type="button"><span class="mobile-nav-icon heart-nav-icon" aria-hidden="true"><svg class="heart-svg" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78Z"/></svg></span>Getestet</button></nav>
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 <div class="modal-backdrop hidden" id="modalBackdrop" role="presentation">
- <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle"><div class="modal-head"><div><div class="overline">YOUR FOOD ARCHIVE</div><h3 id="modalTitle">Spot hinzufügen</h3></div><button id="closeModal" class="icon-button" aria-label="Schließen">✕</button></div>
-  <form id="spotForm" class="modal-form"><input type="hidden" id="spotId" /><label>NAME DES SPOTS <input id="spotName" required maxlength="100" placeholder="z. B. Neuer Lieblingsburger" /></label><label>KATEGORIE <select id="spotCategory" required></select></label><label>STANDORT / ADRESSE (OPTIONAL) <input id="spotAddress" maxlength="180" placeholder="z. B. Karolinenstraße 2, Hamburg" autocomplete="street-address" /></label>
-   <div class="field-pair"><label>STATUS <select id="spotVisited"><option value="false">Noch auf der Liste</option><option value="true">Bereits getestet</option></select></label><label>GESAMTBEWERTUNG ★ <input id="spotScore" type="number" min="0" max="10" step="0.1" placeholder="z. B. 8.7" /></label></div>
-   <label class="value-score-field">PREIS-LEISTUNG ◈ <input id="spotValueScore" type="number" min="0" max="10" step="0.1" placeholder="z. B. 9.2" /></label><p class="rating-help">Bewerte deinen Gesamteindruck und die Preis-Leistung unabhängig voneinander – beides von 0 bis 10.</p>
-   <label>WAS HAST DU GEGESSEN? <input id="spotDish" maxlength="120" placeholder="z. B. Double Smash Burger" /></label><label>DEINE NOTIZEN <textarea id="spotNote" maxlength="1200" rows="3" placeholder="Geschmack, Preis-Leistung, Atmosphäre ..."></textarea></label>
-   <label class="check-row favorite-row"><input id="spotFavorite" type="checkbox" /><span class="favorite-check-icon"><svg class="heart-svg" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78Z"/></svg></span><span class="favorite-copy">Als Favorit speichern</span></label><div class="spot-location-box hidden" id="spotLocationBox"><div class="spot-location-heading">📍 DEIN WEG ZUM FOOD-SPOT</div><div class="spot-location-actions"><a id="spotMapsLink" href="https://www.google.com/maps/" target="_blank" rel="noopener noreferrer" class="spot-maps-button">In Google Maps öffnen ↗</a><a id="spotDirectionsLink" href="https://www.google.com/maps/" target="_blank" rel="noopener noreferrer" class="spot-directions-button hidden">Route planen ↗</a></div><p id="spotMapsHint" class="spot-maps-hint">Ohne Adresse: Suche nach dem Namen in Hamburg</p></div>
-   <div class="modal-footer"><button type="button" id="deleteSpot" class="delete-button hidden">Spot löschen</button><button type="submit" class="save-button">Speichern ↗</button></div>
+ <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle"><div class="modal-head"><div><div class="overline">FOODHUNT / DEIN FOOD JOURNAL</div><h3 id="modalTitle">Spot hinzufügen</h3><p class="modal-subtitle">Dein nächster Lieblingsbiss – festgehalten.</p></div><button id="closeModal" class="icon-button" aria-label="Schließen">✕</button></div>
+  <form id="spotForm" class="modal-form review-form">
+    <input type="hidden" id="spotId" />
+    <section class="review-form-section spot-basics" aria-labelledby="reviewBasicsHeading">
+      <div class="review-section-heading"><span class="section-step">01</span><h4 id="reviewBasicsHeading">Der Spot</h4><span class="section-hint">Deine Food-Collection</span></div>
+      <div class="review-fields-grid">
+        <label class="review-field"><span class="field-title">Restaurant</span><input id="spotName" required maxlength="100" placeholder="Wo warst du essen?" autocomplete="off" /></label>
+        <label class="review-field"><span class="field-title">Kategorie</span><select id="spotCategory" required></select></label>
+      </div>
+      <details class="review-more-info">
+        <summary><span class="more-info-symbol" aria-hidden="true">⌖</span> Adresse hinzufügen <span class="optional-chip">Optional</span><span class="details-arrow" aria-hidden="true">⌄</span></summary>
+        <label class="review-field"><span class="field-title">Standort</span><input id="spotAddress" maxlength="180" placeholder="Straße und Ort" autocomplete="street-address" /></label>
+      </details>
+    </section>
+    <section class="review-form-section review-visit-section" aria-labelledby="reviewVisitHeading">
+      <div class="review-section-heading"><span class="section-step">02</span><h4 id="reviewVisitHeading">Dein Besuch</h4><span class="section-hint">Warst du schon dort?</span></div>
+      <label class="sr-only" for="spotVisited">Besuchsstatus</label>
+      <select id="spotVisited" class="sr-only" aria-label="Besuchsstatus"><option value="false">Noch auf der Liste</option><option value="true">Bereits getestet</option></select>
+      <div class="visit-switch" role="group" aria-label="Besuchsstatus auswählen">
+        <button type="button" class="visit-option active" data-visit-option="false" aria-pressed="true"><span class="visit-option-icon" aria-hidden="true">◇</span><span>Auf meiner Liste</span></button>
+        <button type="button" class="visit-option" data-visit-option="true" aria-pressed="false"><span class="visit-option-icon" aria-hidden="true">✓</span><span>Schon probiert</span></button>
+      </div>
+      <label class="review-field dish-field"><span class="field-title">Was hast du bestellt?</span><input id="spotDish" maxlength="120" placeholder="z. B. Double Smash Burger" autocomplete="off" /></label>
+    </section>
+    <section class="review-form-section review-score-section" aria-labelledby="reviewScoreHeading">
+      <div class="review-section-heading"><span class="section-step">03</span><h4 id="reviewScoreHeading">Dein Urteil</h4><span class="section-hint">Zwei Bewertungen, ganz unabhängig</span></div>
+      <div class="review-score-grid">
+        <div class="review-rating-card taste-rating">
+          <div class="rating-card-top"><span class="rating-card-icon" aria-hidden="true">★</span><div><strong>Gesamtbewertung</strong><p>Wie gut war es wirklich?</p></div></div>
+          <div class="rating-main-value"><label for="spotScore" class="sr-only">Gesamtbewertung von 0 bis 10</label><input id="spotScore" class="rating-number" type="number" min="0" max="10" step="0.1" inputmode="decimal" placeholder="–" /><span class="rating-denom">/ 10</span><button type="button" class="rating-clear" data-clear-rating="spotScore" aria-label="Gesamtbewertung zurücksetzen">↺</button></div>
+          <div class="rating-slider-wrap"><input id="spotScoreRange" type="range" min="0" max="10" step="0.1" value="0" aria-label="Gesamtbewertung einstellen" /><div class="rating-scale"><span>0</span><span id="spotScoreFeedback">Noch offen</span><span>10</span></div></div>
+        </div>
+        <div class="review-rating-card value-rating">
+          <div class="rating-card-top"><span class="rating-card-icon" aria-hidden="true">◈</span><div><strong>Preis-Leistung</strong><p>War es sein Geld wert?</p></div></div>
+          <div class="rating-main-value"><label for="spotValueScore" class="sr-only">Preis-Leistung von 0 bis 10</label><input id="spotValueScore" class="rating-number" type="number" min="0" max="10" step="0.1" inputmode="decimal" placeholder="–" /><span class="rating-denom">/ 10</span><button type="button" class="rating-clear" data-clear-rating="spotValueScore" aria-label="Preis-Leistung zurücksetzen">↺</button></div>
+          <div class="rating-slider-wrap"><input id="spotValueScoreRange" type="range" min="0" max="10" step="0.1" value="0" aria-label="Preis-Leistung einstellen" /><div class="rating-scale"><span>0</span><span id="spotValueScoreFeedback">Noch offen</span><span>10</span></div></div>
+        </div>
+      </div>
+      <p class="review-rating-help">Ziehe den Regler oder tippe deine genaue Bewertung ein – auch 8,7 oder 9,4 sind möglich.</p>
+    </section>
+    <section class="review-form-section review-memories-section" aria-labelledby="reviewMemoriesHeading">
+      <div class="review-section-heading"><span class="section-step">04</span><h4 id="reviewMemoriesHeading">Für später merken</h4></div>
+      <label class="review-field"><span class="field-title">Deine Notiz <span class="field-optional">optional</span></span><textarea id="spotNote" maxlength="1200" rows="3" placeholder="Wie hat's geschmeckt? Was würdest du nochmal bestellen?"></textarea></label>
+      <label class="check-row favorite-row"><input id="spotFavorite" type="checkbox" /> <span class="favorite-check-icon"><svg class="heart-svg" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78Z"/></svg></span><span class="favorite-copy">Zu meinen Favoriten</span><span class="favorite-row-hint">♡</span></label>
+    </section>
+    <div class="spot-location-box hidden" id="spotLocationBox"><div class="spot-location-heading">⌖ &nbsp; SPOT IN GOOGLE MAPS</div><div class="spot-location-actions"><a id="spotMapsLink" href="https://www.google.com/maps/" target="_blank" rel="noopener noreferrer" class="spot-maps-button">In Google Maps öffnen ↗</a><a id="spotDirectionsLink" href="https://www.google.com/maps/" target="_blank" rel="noopener noreferrer" class="spot-directions-button hidden">Route planen ↗</a></div><p id="spotMapsHint" class="spot-maps-hint">Ohne Adresse: Suche nach dem Namen in Hamburg</p></div>
+    <div class="modal-footer review-save-bar"><button type="button" id="deleteSpot" class="delete-button hidden">Löschen</button><button type="submit" class="save-button"><span class="save-button-icon" aria-hidden="true">✓</span> Review speichern <span aria-hidden="true">↗</span></button></div>
   </form>
   <form id="categoryForm" class="modal-form hidden"><label>NAME DER KATEGORIE <input id="newCategoryName" maxlength="40" placeholder="z. B. Türkische Desserts" /></label><label>EMOJI <input id="newCategoryEmoji" maxlength="8" value="🍽️" /></label><div class="modal-footer"><button type="submit" class="save-button">Kategorie erstellen ↗</button></div></form>
   <div class="backup-panel hidden" id="backupPanel"><p>Deine Änderungen werden auf diesem Gerät gespeichert. Sichere sie als JSON-Datei, um sie auf andere Geräte zu übertragen.</p><button id="exportData" class="backup-action">↓ Daten als JSON herunterladen</button><label class="backup-action import-label">↑ JSON-Backup importieren <input type="file" id="importData" accept="application/json,.json" hidden /></label><small>Hinweis: Beim Import wird dein aktueller Stand durch die Sicherungsdatei ersetzt.</small></div>
