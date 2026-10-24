@@ -22,9 +22,11 @@
   <link rel="stylesheet" href="v4.css" />
   <link rel="stylesheet" href="v5.css" />
   <link rel="stylesheet" href="v6.css" />
+  <link rel="stylesheet" href="v7.css" />
   <script defer src="seed.js"></script>
   <script defer src="app.js"></script>
   <script defer src="theme.js"></script>
+  <script defer src="v7.js"></script>
   <script>
     if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.hostname === 'localhost')) {
       window.addEventListener('load', () => navigator.serviceWorker.register('./sw.js').catch(() => {}));
@@ -55,19 +57,19 @@
   </aside>
   <main id="home" class="content">
     <header class="topbar">
-      <div class="location"><span class="live-dot"></span> HAMBURG <span class="location-muted">/ DEIN FOOD GUIDE</span></div>
+      <div class="location"><span class="live-dot"></span> HAMBURG <span class="location-muted">/ CURATED BY YOU</span></div>
       <div class="top-actions"><span class="today-date" id="todayDate"></span><button class="add-button" id="addSpotTop"><span>＋</span> Spot hinzufügen</button></div>
     </header>
     <section class="hero" id="hero">
       <div class="hero-copy">
-        <div class="eyebrow">✳ &nbsp; THE HAMBURG FOOD DIARY — VOL. 02</div>
-        <h1>Good food.<br><span>Good mood.</span></h1>
-        <p>Deine Bucket List, deine Ratings – und immer ein neuer Lieblingsspot.</p>
+        <div class="eyebrow"><span class="hero-spark">✳</span> DEIN HAMBURG FOOD GUIDE <span class="hero-edition">VOL. 07</span></div>
+        <h1>Crave it.<br><span>Save it.</span><br>Love it.</h1>
+        <p>Alle Spots, die du ausprobieren willst. Die besten Bites, deine echten Ratings. Alles an einem Ort.</p>
         <div class="hero-buttons"><button class="button-dark" id="exploreButton">Spots entdecken <span>↗</span></button><button class="button-text" id="surpriseButton">Überrasch mich ↗</button></div>
-        <div class="hero-scribble">SAVE. TASTE. REPEAT. ↗</div>
+        <div class="hero-scribble">MADE FOR YOUR NEXT BITE <span aria-hidden="true">✳</span></div>
       </div>
       <div class="hero-photo" role="img" aria-label="Food Fotografie von einem Burger">
-        <div class="hero-fallback" aria-hidden="true">🍔</div><img class="hero-real-photo" src="https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=1100&amp;q=85&amp;fit=crop" alt="" onerror="this.style.display='none'" /><div class="hero-photo-shade"></div><span class="hero-photo-tag">HAMBURG'S<br><strong>FOOD<br>SCENE</strong></span><span class="hero-photo-label">CURATED WITH APPETITE ✳</span>
+        <div class="hero-fallback" aria-hidden="true">🍔</div><img class="hero-real-photo" src="https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=1100&amp;q=85&amp;fit=crop" alt="" onerror="this.style.display='none'" /><div class="hero-photo-shade"></div><span class="hero-photo-tag"><span class="hero-photo-tag-top">FOODHUNT</span><strong>HH.</strong><span class="hero-photo-tag-bottom">EAT LOCAL ↗</span></span><span class="hero-photo-label">CURATED WITH APPETITE ✳</span>
       </div>
     </section>
     <section class="stat-grid" aria-label="Deine Statistik">
@@ -75,9 +77,13 @@
       <div class="stat-card"><div class="stat-top">BEREITS GETESTET <span>◉</span></div><div class="stat-value" id="visitedCount">4<span class="stat-unit"> / 93</span></div><div class="stat-bottom" id="progressLabel">4,3% deiner Liste</div><div class="stat-progress"><span id="progressBar"></span></div></div>
       <div class="stat-card"><div class="stat-top">FOOD-KATEGORIEN <span>✳</span></div><div class="stat-value" id="categoryCount">13</div><div class="stat-bottom">Von Burger bis Brunch</div></div>
     </section>
-    <section class="categories-section" id="categorySection"><div class="section-header"><div><div class="overline">01 / FINDE DEINEN CRAVING</div><h2>Was gibt’s <em>heute?</em></h2></div><button class="plain-link" id="addCategoryButton">＋ Kategorie erstellen</button></div><div id="categoryTiles" class="category-tiles"></div></section>
-    <section class="rankings-section" id="rankingSection"><div class="section-header"><div><div class="overline">02 / YOUR PERSONAL TOP PICKS</div><h2>Deine <em>Favoriten.</em></h2></div><div class="legend">Deine Lieblingsspots auf einen Blick.</div></div><div class="metric-tabs" id="ratingMetricTabs" role="group" aria-label="Ranking nach Bewertung auswählen"><button type="button" class="metric-tab active" data-metric="score" aria-pressed="true"><span aria-hidden="true">★</span> Gesamt</button><button type="button" class="metric-tab" data-metric="valueScore" aria-pressed="false"><span aria-hidden="true">◈</span> Preis-Leistung</button></div><div id="topRated" class="ranking-grid"></div></section>
-    <section class="browse-section" id="browseSection"><div class="section-header browse-title"><div><div class="overline">03 / THE FOOD JOURNAL</div><h2>Die <em>Bucket List.</em></h2></div><button class="plain-link" id="addSpotSection">＋ Neuen Spot eintragen</button></div>
+    <section class="next-bite" id="nextBiteSection" aria-labelledby="nextBiteTitle">
+  <div class="next-bite-copy"><span class="next-bite-kicker">✦ PICK OF THE DAY</span><h2 id="nextBiteTitle">Dein nächster <em>Bite.</em></h2><p>Ein Spot aus deiner Liste, den du noch entdecken kannst.</p></div>
+  <div class="next-bite-card" id="nextBiteCard" aria-live="polite"></div>
+</section>
+    <section class="categories-section" id="categorySection"><div class="section-header"><div><div class="overline">01 / WHAT ARE YOU CRAVING?</div><h2>Pick your <em>craving.</em></h2></div><button class="plain-link" id="addCategoryButton">＋ Kategorie erstellen</button></div><div id="categoryTiles" class="category-tiles"></div></section>
+    <section class="rankings-section" id="rankingSection"><div class="section-header"><div><div class="overline">02 / YOUR PERSONAL HALL OF FAME</div><h2>Die <em>Legenden.</em></h2></div><div class="legend">Deine Lieblingsspots auf einen Blick.</div></div><div class="metric-tabs" id="ratingMetricTabs" role="group" aria-label="Ranking nach Bewertung auswählen"><button type="button" class="metric-tab active" data-metric="score" aria-pressed="true"><span aria-hidden="true">★</span> Gesamt</button><button type="button" class="metric-tab" data-metric="valueScore" aria-pressed="false"><span aria-hidden="true">◈</span> Preis-Leistung</button></div><div id="topRated" class="ranking-grid"></div></section>
+    <section class="browse-section" id="browseSection"><div class="section-header browse-title"><div><div class="overline">03 / THE FULL HIT LIST</div><h2>Alle <em>Food-Spots.</em></h2></div><button class="plain-link" id="addSpotSection">＋ Neuen Spot eintragen</button></div>
       <div class="browse-controls"><label class="search-field"><span>⌕</span><input id="searchInput" placeholder="Suche nach einem Food-Spot ..." autocomplete="off" /></label><div class="sort-control"><span class="sort-leading-icon" aria-hidden="true">⇅</span><select id="sortSelect" aria-label="Sortieren"><option value="default">Standardsortierung</option><option value="name">Name A–Z</option><option value="rating">Bester Geschmack</option><option value="value">Beste Preis-Leistung</option><option value="new">Neueste zuerst</option></select><svg class="sort-chevron" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="m7 10 5 5 5-5"/></svg></div></div>
       <div class="filter-row" id="quickFilters"><button class="filter-pill active" data-filter="all">Alle Spots</button><button class="filter-pill" data-filter="unvisited">Noch offen</button><button class="filter-pill" data-filter="visited">Getestet ✓</button><button class="filter-pill" data-filter="suggested">Neue Vorschläge ✳</button><button class="filter-pill" data-filter="favorite">Favoriten <svg class="heart-svg" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78Z"/></svg></button></div>
       <div class="result-count"><span id="resultsLabel">93 SPOTS ENTDECKEN</span><span id="categoryFilterName">ALLE KATEGORIEN</span></div><div class="spot-grid" id="spotGrid"></div><div class="empty-state hidden" id="emptyState"><span>🍽️</span><strong>Hier ist noch Platz für guten Geschmack.</strong><p>Kein Spot gefunden. Ändere die Filter oder füge einen neuen hinzu.</p><button id="emptyAdd">＋ Spot hinzufügen</button></div>
@@ -85,7 +91,7 @@
     <footer>FOOD<span>HUNT.</span><span>HAMBURG FOOD ARCHIVE · BUILT FOR THE NEXT BITE · 2026</span><span>MADE WITH APPETITE ✳</span></footer>
   </main>
 </div>
-<nav class="mobile-bottom-nav" aria-label="Mobile Navigation"><button class="mobile-nav-link selected" data-view="home" type="button"><span class="mobile-nav-icon" aria-hidden="true">⌂</span>Home</button><button class="mobile-nav-link" data-view="discover" type="button"><span class="mobile-nav-icon" aria-hidden="true">⌕</span>Entdecken</button><button class="mobile-nav-link" data-view="rankings" type="button"><span class="mobile-nav-icon" aria-hidden="true">★</span>Rankings</button><button class="mobile-nav-link" data-view="visited" type="button"><span class="mobile-nav-icon heart-nav-icon" aria-hidden="true"><svg class="heart-svg" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78Z"/></svg></span>Getestet</button></nav>
+<nav class="mobile-bottom-nav" aria-label="Mobile Navigation"><button class="mobile-nav-link selected" data-view="home" type="button"><span class="mobile-nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="m3 10 9-7 9 7v10a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1Z"/></svg></span>Home</button><button class="mobile-nav-link" data-view="discover" type="button"><span class="mobile-nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m16 16 5 5"/></svg></span>Entdecken</button><button class="mobile-nav-link" data-view="rankings" type="button"><span class="mobile-nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="m12 2 3.2 6.5 7.2 1-5.2 5 .95 7.1L12 18.2 5.85 21.6l.95-7.1-5.2-5 7.2-1Z"/></svg></span>Rankings</button><button class="mobile-nav-link" data-view="visited" type="button"><span class="mobile-nav-icon heart-nav-icon" aria-hidden="true"><svg class="heart-svg" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78Z"/></svg></span>Getestet</button></nav>
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 <div class="modal-backdrop hidden" id="modalBackdrop" role="presentation">
  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle"><div class="modal-head"><div><div class="overline">YOUR FOOD ARCHIVE</div><h3 id="modalTitle">Spot hinzufügen</h3></div><button id="closeModal" class="icon-button" aria-label="Schließen">✕</button></div>

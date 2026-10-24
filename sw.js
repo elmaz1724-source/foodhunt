@@ -1,6 +1,6 @@
 /* FOODHUNT shell: works offline once loaded at least once over HTTPS. */
-const CACHE='foodhunt-shell-v10';
-const ASSETS=['./','./index.html','./style.css','./v3.css','./v4.css','./v5.css','./v6.css','./theme.js','./seed.js','./app.js','./manifest.json','./favicon.svg','./icons/icon-192.png','./icons/icon-512.png','./icons/apple-touch-icon.png'];
+const CACHE='foodhunt-shell-v11';
+const ASSETS=['./','./index.html','./style.css','./v3.css','./v4.css','./v5.css','./v6.css','./v7.css','./v7.js','./theme.js','./seed.js','./app.js','./manifest.json','./favicon.svg','./icons/icon-192.png','./icons/icon-512.png','./icons/apple-touch-icon.png'];
 self.addEventListener('install', e => {
   e.waitUntil(caches.open(CACHE).then(c=>c.addAll(ASSETS)).then(()=>self.skipWaiting()));
 });
