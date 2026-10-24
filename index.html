@@ -24,11 +24,13 @@
   <link rel="stylesheet" href="v6.css" />
   <link rel="stylesheet" href="v7.css" />
   <link rel="stylesheet" href="v8.css" />
+  <link rel="stylesheet" href="v9.css" />
   <script defer src="seed.js"></script>
   <script defer src="app.js"></script>
   <script defer src="theme.js"></script>
   <script defer src="v7.js"></script>
   <script defer src="v8.js"></script>
+  <script defer src="v9.js"></script>
   <script>
     if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.hostname === 'localhost')) {
       window.addEventListener('load', () => navigator.serviceWorker.register('./sw.js').catch(() => {}));
@@ -84,7 +86,7 @@
   <div class="next-bite-card" id="nextBiteCard" aria-live="polite"></div>
 </section>
     <section class="categories-section" id="categorySection"><div class="section-header"><div><div class="overline">01 / WHAT ARE YOU CRAVING?</div><h2>Pick your <em>craving.</em></h2></div><button class="plain-link" id="addCategoryButton">＋ Kategorie erstellen</button></div><div id="categoryTiles" class="category-tiles"></div></section>
-    <section class="rankings-section" id="rankingSection"><div class="section-header"><div><div class="overline">02 / YOUR PERSONAL HALL OF FAME</div><h2>Die <em>Legenden.</em></h2></div><div class="legend">Deine Lieblingsspots auf einen Blick.</div></div><div class="metric-tabs" id="ratingMetricTabs" role="group" aria-label="Ranking nach Bewertung auswählen"><button type="button" class="metric-tab active" data-metric="score" aria-pressed="true"><span aria-hidden="true">★</span> Gesamt</button><button type="button" class="metric-tab" data-metric="valueScore" aria-pressed="false"><span aria-hidden="true">◈</span> Preis-Leistung</button></div><div id="topRated" class="ranking-grid"></div></section>
+    <section class="rankings-section" id="rankingSection"><div class="section-header"><div><div class="overline">02 / YOUR PERSONAL HALL OF FAME</div><h2>Die <em>Legenden.</em></h2></div><div class="legend">Deine Lieblingsspots auf einen Blick.</div></div><div class="metric-tabs" id="ratingMetricTabs" role="group" aria-label="Ranking nach Bewertung auswählen"><button type="button" class="metric-tab active" data-metric="score" aria-pressed="true"><span aria-hidden="true">★</span> Gesamt</button><button type="button" class="metric-tab" data-metric="valueScore" aria-pressed="false"><span aria-hidden="true">◈</span> Preis-Leistung</button><button type="button" class="metric-tab" data-metric="products" aria-pressed="false"><span aria-hidden="true">🍔</span> Top-Gerichte</button></div><div id="topRated" class="ranking-grid"></div></section>
     <section class="browse-section" id="browseSection"><div class="section-header browse-title"><div><div class="overline">03 / THE FULL HIT LIST</div><h2>Alle <em>Food-Spots.</em></h2></div><button class="plain-link" id="addSpotSection">＋ Neuen Spot eintragen</button></div>
       <div class="browse-controls"><label class="search-field"><span>⌕</span><input id="searchInput" placeholder="Suche nach einem Food-Spot ..." autocomplete="off" /></label><div class="sort-control"><span class="sort-leading-icon" aria-hidden="true">⇅</span><select id="sortSelect" aria-label="Sortieren"><option value="default">Standardsortierung</option><option value="name">Name A–Z</option><option value="rating">Bester Geschmack</option><option value="value">Beste Preis-Leistung</option><option value="new">Neueste zuerst</option></select><svg class="sort-chevron" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="m7 10 5 5 5-5"/></svg></div></div>
       <div class="filter-row" id="quickFilters"><button class="filter-pill active" data-filter="all">Alle Spots</button><button class="filter-pill" data-filter="unvisited">Noch offen</button><button class="filter-pill" data-filter="visited">Getestet ✓</button><button class="filter-pill" data-filter="suggested">Neue Vorschläge ✳</button><button class="filter-pill" data-filter="favorite">Favoriten <svg class="heart-svg" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78Z"/></svg></button></div>
@@ -120,8 +122,25 @@
       </div>
       <label class="review-field dish-field"><span class="field-title">Was hast du bestellt?</span><input id="spotDish" maxlength="120" placeholder="z. B. Double Smash Burger" autocomplete="off" /></label>
     </section>
+    <section class="review-form-section product-section" aria-labelledby="productHeading">
+  <div class="review-section-heading"><span class="section-step">03</span><h4 id="productHeading">Deine Gerichte</h4><span class="section-hint">Jeder Besuch zählt</span></div>
+  <p class="product-intro">Was hast du probiert? Bewerte jedes Gericht einzeln – dein Restaurant-Rating passt sich automatisch an.</p>
+  <div class="product-summary" id="productSummary" aria-live="polite"></div>
+  <div class="product-list" id="productList"></div>
+  <p id="productLegacyNotice" class="product-legacy-notice hidden"></p>
+  <button type="button" class="product-add" id="productAdd"><span class="product-add-plus" aria-hidden="true">＋</span><span>Gericht hinzufügen <small>oder nächsten Besuch erfassen</small></span><span aria-hidden="true">↗</span></button>
+  <div id="productEditor" class="product-editor hidden">
+    <div class="product-editor-head"><strong id="productEditorHeading">Gericht bewerten</strong><button type="button" id="productCancel" class="product-editor-close" aria-label="Produktbearbeitung abbrechen">✕</button></div>
+    <label class="review-field"><span class="field-title">Was hast du gegessen? *</span><input id="productName" type="text" maxlength="120" placeholder="z. B. Smash Burger" autocomplete="off" /></label>
+    <div class="product-edit-grid"><label class="review-field"><span class="field-title">Deine Note / 10 *</span><input id="productRating" type="number" min="0" max="10" step="0.1" inputmode="decimal" placeholder="8,7" /></label><label class="review-field"><span class="field-title">Preis in € <span class="field-optional">optional</span></span><input id="productPrice" type="number" min="0" max="9999" step="0.01" inputmode="decimal" placeholder="12,90" /></label></div>
+    <div class="product-editor-slider"><input id="productRatingRange" type="range" min="0" max="10" step="0.1" value="0" aria-label="Produktbewertung einstellen" /><span id="productRatingHint">Wähle deine Bewertung</span></div>
+    <div class="product-edit-grid"><label class="review-field"><span class="field-title">Besuchsdatum <span class="field-optional">optional</span></span><input id="productDate" type="date" /></label><label class="review-field"><span class="field-title">Kurzer Eindruck <span class="field-optional">optional</span></span><input id="productNote" type="text" maxlength="300" placeholder="Saftig, frisch, knusprig …" /></label></div>
+    <p id="productError" class="product-error hidden" role="alert"></p>
+    <button type="button" class="product-save" id="productSave">Gericht übernehmen <span aria-hidden="true">✓</span></button>
+  </div>
+</section>
     <section class="review-form-section review-score-section" aria-labelledby="reviewScoreHeading">
-      <div class="review-section-heading"><span class="section-step">03</span><h4 id="reviewScoreHeading">Dein Urteil</h4><span class="section-hint">Zwei Bewertungen, ganz unabhängig</span></div>
+      <div class="review-section-heading"><span class="section-step">04</span><h4 id="reviewScoreHeading">Restaurantwertung</h4><span class="section-hint">Gesamt & Preis-Leistung</span></div>
       <div class="review-score-grid">
         <div class="review-rating-card taste-rating">
           <div class="rating-card-top"><span class="rating-card-icon" aria-hidden="true">★</span><div><strong>Gesamtbewertung</strong><p>Wie gut war es wirklich?</p></div></div>
@@ -134,10 +153,10 @@
           <div class="rating-slider-wrap"><input id="spotValueScoreRange" type="range" min="0" max="10" step="0.1" value="0" aria-label="Preis-Leistung einstellen" /><div class="rating-scale"><span>0</span><span id="spotValueScoreFeedback">Noch offen</span><span>10</span></div></div>
         </div>
       </div>
-      <p class="review-rating-help">Ziehe den Regler oder tippe deine genaue Bewertung ein – auch 8,7 oder 9,4 sind möglich.</p>
+      <p id="derivedRatingNotice" class="review-rating-help">Ohne Einzelgerichte bleibt deine bisherige Gesamtbewertung bestehen. Mit bewerteten Gerichten wird daraus automatisch der Durchschnitt.</p>
     </section>
     <section class="review-form-section review-memories-section" aria-labelledby="reviewMemoriesHeading">
-      <div class="review-section-heading"><span class="section-step">04</span><h4 id="reviewMemoriesHeading">Für später merken</h4></div>
+      <div class="review-section-heading"><span class="section-step">05</span><h4 id="reviewMemoriesHeading">Für später merken</h4></div>
       <label class="review-field"><span class="field-title">Deine Notiz <span class="field-optional">optional</span></span><textarea id="spotNote" maxlength="1200" rows="3" placeholder="Wie hat's geschmeckt? Was würdest du nochmal bestellen?"></textarea></label>
       <label class="check-row favorite-row"><input id="spotFavorite" type="checkbox" /> <span class="favorite-check-icon"><svg class="heart-svg" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78Z"/></svg></span><span class="favorite-copy">Zu meinen Favoriten</span><span class="favorite-row-hint">♡</span></label>
     </section>
