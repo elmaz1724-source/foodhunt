@@ -28,6 +28,24 @@ const category=id=>categories.find(c=>c.id===id)||{name:'Andere',emoji:'🍽️'
 const mapsQuery=s=>[s.name,(typeof s.address==='string'&&s.address.trim())||'Hamburg'].join(', ');
 const mapsUrl=s=>'https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(mapsQuery(s));
 const directionsUrl=s=>'https://www.google.com/maps/dir/?api=1&destination='+encodeURIComponent(mapsQuery(s));
+
+const cleanProduct=p=>({
+ id:typeof p.id==='string'&&p.id?p.id:'item-'+Date.now()+'-'+Math.random().toString(36).slice(2,7),
+ name:String(p.name||'').trim().slice(0,120),
+ score:p.score===null||p.score===''||p.score===undefined?null:Number(p.score),
+ price:p.price===null||p.price===''||p.price===undefined?null:Number(p.price),
+ date:typeof p.date==='string'&&/^\d{4}-\d{2}-\d{2}$/.test(p.date)?p.date:'',
+ note:String(p.note||'').trim().slice(0,300)
+});
+function productStats(s){
+ const products=Array.isArray(s.products)?s.products.filter(p=>p&&typeof p.name==='string'&&p.name.trim()):[];
+ const rated=products.filter(p=>p.score!==null&&p.score!==undefined&&Number.isFinite(Number(p.score))&&Number(p.score)>=0&&Number(p.score)<=10);
+ const average=rated.length?Math.round((rated.reduce((sum,p)=>sum+Number(p.score),0)/rated.length)*10)/10:null;
+ const best=rated.length?[...rated].sort((a,b)=>Number(b.score)-Number(a.score))[0]:null;
+ return {total:products.length,ratedCount:rated.length,average,best};
+}
+const scoreFor=s=>productStats(s).average??s.score??null;
+
 const save=()=>{try{localStorage.setItem(SPOT_KEY,JSON.stringify(spots));localStorage.setItem(CAT_KEY,JSON.stringify(categories))}catch{toast('Speicherplatz voll – bitte Daten exportieren')}document.dispatchEvent(new Event('foodhunt:datachange'))};
 let toastTimer;function toast(message){const el=$('toast');el.textContent=message;el.classList.add('visible');clearTimeout(toastTimer);toastTimer=setTimeout(()=>el.classList.remove('visible'),3000)}
 function renderStats(){const done=spots.filter(s=>s.visited).length,total=spots.length,pct=total?done/total*100:0;$('spotCount').textContent=total;$('visitedCount').innerHTML=`${done}<span class="stat-unit"> / ${total}</span>`;$('progressLabel').textContent=`${fmt(pct)}% deiner Liste`;$('progressBar').style.width=pct+'%';$('categoryCount').textContent=categories.length}
@@ -40,14 +58,24 @@ function renderCategories(){
 }
 function renderRankings(){
  const metric=ui.ratingMetric;
- const top=spots.filter(s=>s[metric]!==null&&s[metric]!==undefined&&Number.isFinite(Number(s[metric]))).sort((a,b)=>Number(b[metric])-Number(a[metric])).slice(0,4);
- const pLabel=metric==='score'?'Gesamt':'Preis-Leistung';
- $('topRated').innerHTML=top.map((s,i)=>{
-  const secondary=metric==='score'?s.valueScore:s.score;
-  const secondaryLabel=metric==='score'?'Preis-Leistung':'Gesamt';
-  const c=category(s.category);
-  return `<button type="button" class="ranking-card ${i===0?'ranking-winner':''}" data-spot="${escapeHTML(s.id)}"><span class="rank-num">${i===0?'♛ TOP PICK':'#'+String(i+1).padStart(2,'0')} <span class="rank-category">${escapeHTML(c.name)}</span></span><span class="rank-icon" aria-hidden="true">${i===0?'✦':'✳'}</span><span class="rank-big-emoji" aria-hidden="true">${escapeHTML(c.emoji)}</span><span class="rank-name">${escapeHTML(s.name)}</span><span class="rank-bottom"><span class="rank-score">${fmt(s[metric])}<small> / 10</small></span>${secondary!==null&&secondary!==undefined?`<span class="rank-secondary">${secondaryLabel}: ${fmt(secondary)}</span>`:''}</span></button>`;
- }).join('')||'<div class="empty-state"><span>★</span><strong>Noch keine Bewertungen</strong><p>Bewerte erst ein Restaurant in dieser Kategorie.</p></div>';
+ let html='';
+ if(metric==='products'){
+  const all=spots.flatMap(s=>(Array.isArray(s.products)?s.products:[]).filter(p=>p&&p.name&&p.score!==null&&p.score!==undefined&&Number.isFinite(Number(p.score))&&Number(p.score)>=0&&Number(p.score)<=10).map(p=>({spot:s,item:p}))).sort((a,b)=>Number(b.item.score)-Number(a.item.score)).slice(0,4);
+  html=all.map(({spot,item},i)=>{
+   const c=category(spot.category);
+   return `<button type="button" class="ranking-card ${i===0?'ranking-winner':''}" data-spot="${escapeHTML(spot.id)}"><span class="rank-num">${i===0?'♛ BESTES GERICHT':'#'+String(i+1).padStart(2,'0')} <span class="rank-category">${escapeHTML(c.name)}</span></span><span class="rank-icon" aria-hidden="true">${i===0?'✦':'✳'}</span><span class="rank-big-emoji" aria-hidden="true">${escapeHTML(c.emoji)}</span><span class="rank-name">${escapeHTML(item.name)}</span><span class="rank-bottom"><span class="rank-score">${fmt(item.score)}<small> / 10</small></span><span class="rank-secondary">${escapeHTML(spot.name)}</span></span></button>`;
+  }).join('')||'<div class="empty-state"><span>🍔</span><strong>Deine Food-Legenden fehlen noch</strong><p>Bewerte einzelne Gerichte in einem Restaurant – dann erscheinen sie hier.</p></div>';
+ }else{
+  const top=spots.filter(s=>{const v=metric==='score'?scoreFor(s):s.valueScore;return v!==null&&v!==undefined&&Number.isFinite(Number(v))}).sort((a,b)=>Number(metric==='score'?scoreFor(b):b.valueScore)-Number(metric==='score'?scoreFor(a):a.valueScore)).slice(0,4);
+  html=top.map((s,i)=>{
+   const secondary=metric==='score'?s.valueScore:scoreFor(s);
+   const secondaryLabel=metric==='score'?'Preis-Leistung':'Gesamt';
+   const c=category(s.category);
+   const value=metric==='score'?scoreFor(s):s.valueScore;
+   return `<button type="button" class="ranking-card ${i===0?'ranking-winner':''}" data-spot="${escapeHTML(s.id)}"><span class="rank-num">${i===0?'♛ TOP PICK':'#'+String(i+1).padStart(2,'0')} <span class="rank-category">${escapeHTML(c.name)}</span></span><span class="rank-icon" aria-hidden="true">${i===0?'✦':'✳'}</span><span class="rank-big-emoji" aria-hidden="true">${escapeHTML(c.emoji)}</span><span class="rank-name">${escapeHTML(s.name)}</span><span class="rank-bottom"><span class="rank-score">${fmt(value)}<small> / 10</small></span>${secondary!==null&&secondary!==undefined?`<span class="rank-secondary">${secondaryLabel}: ${fmt(secondary)}</span>`:''}</span></button>`;
+  }).join('')||'<div class="empty-state"><span>★</span><strong>Noch keine Bewertungen</strong><p>Bewerte zuerst ein Restaurant in dieser Kategorie.</p></div>';
+ }
+ $('topRated').innerHTML=html;
  document.querySelectorAll('[data-metric]').forEach(b=>{const active=b.dataset.metric===metric;b.classList.toggle('active',active);b.setAttribute('aria-pressed',String(active))});
 }
 function filteredSpots(){let list=spots.filter(s=>{
@@ -56,10 +84,10 @@ function filteredSpots(){let list=spots.filter(s=>{
  if(ui.filter==='visited'&&!s.visited)return false;
  if(ui.filter==='suggested'&&!s.suggested)return false;
  if(ui.filter==='favorite'&&!s.favorite)return false;
- if(ui.search&&!(`${s.name} ${category(s.category).name} ${s.dish||''} ${s.note||''} ${s.address||''}`).toLocaleLowerCase('de').includes(ui.search.toLocaleLowerCase('de')))return false;
+ if(ui.search&&!(`${s.name} ${category(s.category).name} ${s.dish||''} ${s.note||''} ${s.address||''} ${(Array.isArray(s.products)?s.products:[]).map(p=>[p.name,p.note].join(' ')).join(' ')}`).toLocaleLowerCase('de').includes(ui.search.toLocaleLowerCase('de')))return false;
  return true});
  if(ui.sort==='name')list.sort((a,b)=>a.name.localeCompare(b.name,'de'));
- else if(ui.sort==='rating')list.sort((a,b)=>(b.score??-1)-(a.score??-1));
+ else if(ui.sort==='rating')list.sort((a,b)=>(scoreFor(b)??-1)-(scoreFor(a)??-1));
  else if(ui.sort==='value')list.sort((a,b)=>(b.valueScore??-1)-(a.valueScore??-1));
  else if(ui.sort==='new')list.sort((a,b)=>(b.addedAt||'').localeCompare(a.addedAt||''));
  return list}
@@ -73,10 +101,11 @@ function renderSpots(){
   const tint=Math.max(0,categories.findIndex(x=>x.id===s.category))%6;
   const mapLabel=s.address?'Standort ansehen':'In Maps suchen';
   const badge=s.visited?'<span class="spot-badge reviewed">✓ GETESTET</span>':s.suggested?'<span class="spot-badge suggested">✳ NEU</span>':'<span class="spot-badge">AUF DER LISTE</span>';
-  const hasTaste=s.score!==null&&s.score!==undefined;
+  const rating=scoreFor(s),product=productStats(s);
+  const hasTaste=rating!==null&&rating!==undefined;
   const hasValue=s.valueScore!==null&&s.valueScore!==undefined;
-  const scores=(hasTaste||hasValue)?`<span class="spot-dual-ratings">${hasTaste?`<span class="mini-rating taste"><span class="mini-rating-label">★ Gesamt</span><strong>${fmt(s.score)}</strong></span>`:''}${hasValue?`<span class="mini-rating value"><span class="mini-rating-label">◈ Preis-Leistung</span><strong>${fmt(s.valueScore)}</strong></span>`:''}</span>`:`<span class="spot-status">${s.visited?'Bereits besucht':'Noch nicht getestet'}</span>`;
-  return `<article class="spot-card cat-tone-${tint} ${s.favorite?'is-favorite':''}"><div class="spot-cover"><span class="spot-cover-orbit" aria-hidden="true"></span><span class="spot-cover-emoji" aria-hidden="true">${escapeHTML(c.emoji)}</span>${badge}<button class="favorite-heart ${s.favorite?'active':''}" type="button" data-favorite="${escapeHTML(s.id)}" aria-pressed="${s.favorite?'true':'false'}" aria-label="${escapeHTML(s.name)} ${s.favorite?'aus Favoriten entfernen':'als Favorit speichern'}" title="${s.favorite?'Aus Favoriten entfernen':'Zu Favoriten hinzufügen'}"><svg class="heart-svg" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78Z"/></svg></button></div><button class="spot-card-main" type="button" data-spot="${escapeHTML(s.id)}"><span class="spot-category"><span class="category-dot"></span> ${escapeHTML(c.name)}</span><h3>${escapeHTML(s.name)}</h3><div class="spot-footer">${scores}<span class="spot-enter" aria-hidden="true">↗</span></div></button><a class="spot-map-link" href="${escapeHTML(mapsUrl(s))}" target="_blank" rel="noopener noreferrer" aria-label="${escapeHTML(s.name)} – ${escapeHTML(mapLabel)}"><span class="spot-map-icon" aria-hidden="true">⌖</span>${escapeHTML(mapLabel)}<span aria-hidden="true">↗</span></a></article>`;
+  const scores=(hasTaste||hasValue)?`<span class="spot-dual-ratings">${hasTaste?`<span class="mini-rating taste"><span class="mini-rating-label">★ Gesamt</span><strong>${fmt(rating)}</strong></span>`:''}${hasValue?`<span class="mini-rating value"><span class="mini-rating-label">◈ Preis-Leistung</span><strong>${fmt(s.valueScore)}</strong></span>`:''}</span>`:`<span class="spot-status">${s.visited?'Bereits besucht':'Noch nicht getestet'}</span>`;
+  return `<article class="spot-card cat-tone-${tint} ${s.favorite?'is-favorite':''}"><div class="spot-cover"><span class="spot-cover-orbit" aria-hidden="true"></span><span class="spot-cover-emoji" aria-hidden="true">${escapeHTML(c.emoji)}</span>${badge}<button class="favorite-heart ${s.favorite?'active':''}" type="button" data-favorite="${escapeHTML(s.id)}" aria-pressed="${s.favorite?'true':'false'}" aria-label="${escapeHTML(s.name)} ${s.favorite?'aus Favoriten entfernen':'als Favorit speichern'}" title="${s.favorite?'Aus Favoriten entfernen':'Zu Favoriten hinzufügen'}"><svg class="heart-svg" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78Z"/></svg></button></div><button class="spot-card-main" type="button" data-spot="${escapeHTML(s.id)}"><span class="spot-category"><span class="category-dot"></span> ${escapeHTML(c.name)}</span><h3>${escapeHTML(s.name)}</h3>${product.best?`<div class="spot-best-item"><span class="best-item-label">🏆 BESTES GERICHT</span><span class="best-item-name">${escapeHTML(product.best.name)}</span><strong>★ ${fmt(product.best.score)}</strong></div><span class="spot-product-count">${product.total} Gericht${product.total===1?'':'e'} getestet</span>`:'' }<div class="spot-footer">${scores}<span class="spot-enter" aria-hidden="true">↗</span></div></button><a class="spot-map-link" href="${escapeHTML(mapsUrl(s))}" target="_blank" rel="noopener noreferrer" aria-label="${escapeHTML(s.name)} – ${escapeHTML(mapLabel)}"><span class="spot-map-icon" aria-hidden="true">⌖</span>${escapeHTML(mapLabel)}<span aria-hidden="true">↗</span></a></article>`;
  }).join('');
 }
 function render(){renderStats();renderSideCategories();renderCategories();renderRankings();renderSpots();document.querySelectorAll('.filter-pill').forEach(b=>b.classList.toggle('active',b.dataset.filter===ui.filter));document.querySelectorAll('.nav-link').forEach(b=>b.classList.toggle('selected',b.dataset.view===ui.view))}
@@ -90,7 +119,39 @@ function openModal(type='spot',id=null){$('modalBackdrop').classList.remove('hid
  }else if(type==='category'){$('newCategoryName').value='';$('newCategoryEmoji').value='🍽️';$('newCategoryName').focus()}}
 function syncMapsLinks(){const name=$('spotName').value.trim(),address=$('spotAddress').value.trim();$('spotLocationBox').classList.toggle('hidden',!name);if(!name)return;const s={name,address};$('spotMapsLink').href=mapsUrl(s);$('spotMapsHint').textContent=address?'Adresse hinterlegt – bitte den Treffer prüfen':'Ohne Adresse: Suche nach dem Namen in Hamburg';$('spotDirectionsLink').classList.toggle('hidden',!address);if(address)$('spotDirectionsLink').href=directionsUrl(s)}
 function closeModal(){$('modalBackdrop').classList.add('hidden');document.body.style.overflow=''}
-function saveSpot(e){e.preventDefault();const name=$('spotName').value.trim(),categoryId=$('spotCategory').value;if(!name||!categories.some(c=>c.id===categoryId))return toast('Bitte Name und Kategorie angeben');const scoreText=$('spotScore').value.trim(),score=scoreText===''?null:Number(scoreText);if(score!==null&&(!Number.isFinite(score)||score<0||score>10))return toast('Bewertung muss zwischen 0 und 10 liegen');const valueText=$('spotValueScore').value.trim(),valueScore=valueText===''?null:Number(valueText);if(valueScore!==null&&(!Number.isFinite(valueScore)||valueScore<0||valueScore>10))return toast('Preis-Leistung muss zwischen 0 und 10 liegen');const id=$('spotId').value;const prev=spots.find(s=>s.id===id);const entry={id:prev?.id||('custom-'+Date.now()+'-'+Math.random().toString(36).slice(2,6)),name,category:categoryId,score,valueScore,visited:$('spotVisited').value==='true'||score!==null||valueScore!==null,suggested:prev?.suggested||false,favorite:$('spotFavorite').checked,dish:$('spotDish').value.trim(),note:$('spotNote').value.trim(),address:$('spotAddress').value.trim(),addedAt:prev?.addedAt||new Date().toISOString().slice(0,10)};if(prev)spots=spots.map(s=>s.id===id?entry:s);else spots.unshift(entry);save();render();closeModal();toast(prev?'Food-Spot aktualisiert ✓':'Neuer Food-Spot hinzugefügt ✓')}
+function saveSpot(e){
+ e.preventDefault();
+ const name=$('spotName').value.trim(),categoryId=$('spotCategory').value;
+ if(!name||!categories.some(c=>c.id===categoryId))return toast('Bitte Name und Kategorie angeben');
+ const editor=window.FOODHUNT_PRODUCT_EDITOR;
+ if(editor&&editor.commitPending()===false)return;
+ const id=$('spotId').value,prev=spots.find(s=>s.id===id);
+ const products=editor?editor.getItems():(Array.isArray(prev?.products)?copy(prev.products):[]);
+ if(products.length>300)return toast('Maximal 300 Gerichte pro Restaurant');
+ const validProducts=products.every(p=>p&&typeof p.name==='string'&&p.name.trim()&&p.name.length<=120&&p.score!==null&&p.score!==undefined&&Number.isFinite(Number(p.score))&&Number(p.score)>=0&&Number(p.score)<=10&&(p.price===null||p.price===undefined||(Number.isFinite(Number(p.price))&&Number(p.price)>=0&&Number(p.price)<=9999)));
+ if(!validProducts)return toast('Bitte Gericht und Note zwischen 0 und 10 prüfen');
+ const stats=productStats({products});
+ const inputScore=$('spotScore').value.trim();
+ const manualScore=inputScore===''?null:Number(inputScore);
+ if(manualScore!==null&&(!Number.isFinite(manualScore)||manualScore<0||manualScore>10))return toast('Bewertung muss zwischen 0 und 10 liegen');
+ const score=stats.ratedCount?stats.average:manualScore;
+ const valueText=$('spotValueScore').value.trim(),valueScore=valueText===''?null:Number(valueText);
+ if(valueScore!==null&&(!Number.isFinite(valueScore)||valueScore<0||valueScore>10))return toast('Preis-Leistung muss zwischen 0 und 10 liegen');
+ let legacyScore=prev?.legacyScore??null;
+ if(stats.ratedCount&&legacyScore===null&&!Array.isArray(prev?.products)&&prev?.score!==null&&prev?.score!==undefined&&Number.isFinite(Number(prev.score)))legacyScore=Number(prev.score);
+ const entry={
+  id:prev?.id||('custom-'+Date.now()+'-'+Math.random().toString(36).slice(2,6)),
+  name,category:categoryId,score,valueScore,
+  visited:$('spotVisited').value==='true'||score!==null||valueScore!==null||products.length>0,
+  suggested:prev?.suggested||false,favorite:$('spotFavorite').checked,
+  dish:$('spotDish').value.trim(),note:$('spotNote').value.trim(),
+  address:$('spotAddress').value.trim(),addedAt:prev?.addedAt||new Date().toISOString().slice(0,10),
+  products:products.map(cleanProduct),legacyScore
+ };
+ if(prev)spots=spots.map(s=>s.id===id?entry:s);else spots.unshift(entry);
+ save();render();closeModal();
+ toast(prev?'Food-Spot aktualisiert ✓':'Neuer Food-Spot hinzugefügt ✓');
+}
 function addCategory(e){e.preventDefault();const name=$('newCategoryName').value.trim();if(!name)return toast('Bitte einen Kategorienamen eingeben');if(categories.some(c=>c.name.toLowerCase()===name.toLowerCase()))return toast('Diese Kategorie gibt es bereits');const id='category-'+Date.now();categories.push({id,name,emoji:$('newCategoryEmoji').value.trim()||'🍽️'});ui.category=id;ui.filter='all';save();render();closeModal();toast('Neue Food-Kategorie erstellt ✳');scrollToId('categorySection')}
 function toggleFavorite(id,button){
  const spot=spots.find(s=>s.id===id);
