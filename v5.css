@@ -1,0 +1,167 @@
+/* FOODHUNT V5 · focused iPhone polish and real favorites */
+.rankings-section .section-header{align-items:flex-start;gap:10px}
+.rankings-section .section-header .legend{
+  max-width:220px;font-size:11px;line-height:1.5;text-align:right;
+  padding-top:3px;color:var(--muted)
+}
+.rankings-section .section-header h2{overflow-wrap:normal}
+.metric-tabs{gap:10px;margin:0 0 18px}
+.metric-tab{border-radius:13px;white-space:nowrap}
+.ranking-card{
+  min-width:0;min-height:166px;
+  padding:18px;
+  overflow:hidden;
+  border-radius:22px;
+  transition:transform .17s ease,background .17s ease,border-color .17s ease;
+}
+.rank-num{
+  position:relative;z-index:2;
+  max-width:calc(100% - 32px);
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+  font-size:11px;letter-spacing:.045em;line-height:1.25;
+}
+.rank-icon{
+  right:14px;top:14px;z-index:1;
+  font-size:25px;opacity:.7;
+  pointer-events:none;filter:none;
+}
+.ranking-card:first-child .rank-icon{color:var(--accent-strong);opacity:1}
+.ranking-card .rank-name{
+  font-size:21px;line-height:1.13;letter-spacing:-.55px;
+  max-width:100%;overflow-wrap:anywhere;
+}
+.ranking-card .rank-score{font-size:28px;margin-top:9px;line-height:1}
+.rank-secondary{font-size:10px;line-height:1.4}
+.ranking-card:first-child{background:linear-gradient(146deg,rgba(241,180,110,.18),var(--v3-card) 85%)}
+.sort-control{
+  position:relative;display:flex;align-items:center;flex:0 0 226px;
+  min-width:0;height:54px;
+  border:1px solid var(--v3-border);
+  border-radius:16px;
+  background:var(--v3-card);
+  transition:border-color .18s ease,background .18s ease;
+}
+.sort-control:focus-within{border-color:var(--accent)}
+.sort-leading-icon{
+  position:absolute;left:15px;top:50%;transform:translateY(-50%);
+  font-size:18px;color:var(--accent-strong);
+  line-height:1;pointer-events:none;
+}
+.sort-chevron{
+  position:absolute;right:16px;top:50%;transform:translateY(-50%);
+  width:18px;height:18px;color:var(--accent-strong);pointer-events:none;
+}
+.browse-controls .sort-control select,
+.browse-controls select#sortSelect{
+  appearance:none;-webkit-appearance:none;
+  display:block;width:100%;height:100%;min-height:54px;
+  min-width:0;padding:0 41px 0 43px;
+  border:0;border-radius:inherit;background:transparent!important;box-shadow:none;
+  font:700 14px/1.3 var(--font);color:var(--ink);
+  cursor:pointer;
+}
+.heart-svg{
+  display:block;width:25px;height:25px;overflow:visible;
+  vector-effect:non-scaling-stroke;
+}
+.favorite-heart{
+  position:absolute;z-index:3;top:58px;right:16px;
+  display:grid;place-items:center;
+  width:46px;height:46px;padding:0;
+  border:1px solid var(--v3-border);border-radius:16px;
+  background:var(--surface-2);color:var(--ink-soft);
+  cursor:pointer;
+  transition:color .18s ease,background .18s ease,border-color .18s ease,transform .18s ease,box-shadow .18s ease;
+  -webkit-tap-highlight-color:transparent;
+}
+.favorite-heart .heart-svg{width:24px;height:24px;transition:transform .2s ease,fill .18s ease}
+.favorite-heart:hover{transform:translateY(-2px);color:var(--accent-strong);border-color:var(--accent)}
+.favorite-heart:active{transform:scale(.87)}
+.favorite-heart.active{
+  color:#ff9b87;background:rgba(255,122,104,.13);
+  border-color:rgba(255,154,135,.33);
+  box-shadow:0 5px 15px rgba(245,100,95,.08);
+}
+.favorite-heart.active .heart-svg{fill:currentColor;stroke:currentColor}
+.favorite-heart.active:hover .heart-svg{transform:scale(1.12)}
+.spot-card{position:relative}
+.spot-card-main{position:relative;z-index:1}
+.spot-card h3{padding-right:54px}
+.spot-card.is-favorite{border-color:rgba(255,154,135,.23)}
+.spot-card .spot-map-link{position:relative;z-index:2}
+.heart-nav-icon .heart-svg{width:27px;height:27px;stroke-width:1.9px}
+.mobile-nav-link.selected .heart-nav-icon .heart-svg{fill:currentColor;stroke:currentColor}
+.favorite-row{
+  display:flex!important;flex-direction:row!important;
+  align-items:center!important;gap:12px!important;
+  padding:12px 14px;border:1px solid var(--v3-border);border-radius:15px;
+  background:var(--surface-2);cursor:pointer;letter-spacing:0!important;
+}
+.favorite-row input[type=checkbox]{width:20px;height:20px;margin:0;accent-color:var(--accent)}
+.favorite-row .favorite-check-icon{
+  width:24px;height:24px;color:var(--muted);
+  display:flex;align-items:center;justify-content:center;
+}
+.favorite-row .heart-svg{width:21px;height:21px}
+.favorite-row:has(input:checked){
+  border-color:rgba(255,154,135,.36);background:rgba(255,122,104,.09);
+}
+.favorite-row:has(input:checked) .favorite-check-icon{color:#ff9b87}
+.favorite-row:has(input:checked) .heart-svg{fill:currentColor;stroke:currentColor}
+.favorite-copy{color:var(--ink);font-size:12px;font-weight:700}
+@media(max-width:1080px){
+ .browse-controls .sort-control{flex:0 0 auto;width:100%}
+}
+@media(max-width:720px){
+ .rankings-section .section-header{
+   display:block;margin-bottom:16px;
+ }
+ .rankings-section .section-header .legend{
+   display:block;text-align:left;padding-top:9px;
+   margin:0;max-width:none;font-size:11px;
+ }
+ .metric-tabs{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-bottom:14px}
+ .metric-tab{
+   display:flex;justify-content:center;
+   min-width:0;min-height:46px;
+   padding:10px 11px;border-radius:14px;
+   font-size:12px;letter-spacing:0;
+ }
+ .metric-tab span{font-size:16px}
+ .ranking-grid{gap:10px}
+ .ranking-card{flex:0 0 min(65vw,238px);min-height:168px;padding:16px;border-radius:20px}
+ .ranking-card .rank-name{font-size:20px}
+ .ranking-card .rank-score{font-size:27px}
+ .rank-num{font-size:10px;max-width:calc(100% - 30px);letter-spacing:.02em}
+ .rank-icon{top:15px;right:14px;font-size:22px}
+ .rankings-section{margin-bottom:6px}
+ .browse-section{margin-top:48px}
+ .browse-controls{gap:11px}
+ .browse-controls .sort-control{
+   width:100%;min-height:58px;height:58px;
+   border-radius:16px;
+   box-shadow:none;
+ }
+ .browse-controls .sort-control select{
+   min-height:58px;height:58px;
+   font-size:16px;font-weight:700;letter-spacing:0;
+   padding-left:49px;padding-right:46px;
+ }
+ .sort-leading-icon{left:17px;font-size:20px}
+ .sort-chevron{width:21px;height:21px;right:16px}
+ .filter-row{margin-top:3px}
+ .spot-card h3{padding-right:53px}
+ .favorite-heart{right:15px;top:55px;width:45px;height:45px;border-radius:15px}
+ .mobile-nav-link .heart-nav-icon .heart-svg{width:29px;height:29px}
+ .mobile-nav-link.selected .heart-nav-icon .heart-svg{fill:currentColor}
+ .rankings-section .section-header h2{font-size:29px}
+ .result-count{margin-top:9px}
+}
+@media(max-width:390px){
+ .metric-tab{font-size:11px;padding:9px 8px;gap:6px}
+ .ranking-card{flex-basis:225px}
+ .favorite-heart{width:43px;height:43px;right:13px}
+}
+@media(prefers-reduced-motion:reduce){
+ .favorite-heart,.favorite-heart .heart-svg,.ranking-card{transition:none!important}
+}

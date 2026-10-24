@@ -42,10 +42,10 @@ function renderCategories(){
 function renderRankings(){
  const metric=ui.ratingMetric;
  const top=spots.filter(s=>s[metric]!==null&&s[metric]!==undefined&&Number.isFinite(Number(s[metric]))).sort((a,b)=>Number(b[metric])-Number(a[metric])).slice(0,4);
- const pLabel=metric==='score'?'Gesamtbewertung':'Preis-Leistung';
+ const pLabel=metric==='score'?'Gesamt':'Preis-Leistung';
  $('topRated').innerHTML=top.map((s,i)=>{
   const secondary=metric==='score'?s.valueScore:s.score;
-  const secondaryLabel=metric==='score'?'Preis-Leistung':'Gesamtbewertung';
+  const secondaryLabel=metric==='score'?'Preis-Leistung':'Gesamt';
   return `<button type="button" class="ranking-card" data-spot="${escapeHTML(s.id)}"><span class="rank-num">#${String(i+1).padStart(2,'0')} · ${pLabel}</span><span class="rank-icon" aria-hidden="true">${i===0?'✦':'✳'}</span><span class="rank-name">${escapeHTML(s.name)}</span><span class="rank-score">${fmt(s[metric])}<small> / 10</small></span>${secondary!==null&&secondary!==undefined?`<span class="rank-secondary">${secondaryLabel}: ${fmt(secondary)}</span>`:''}</button>`;
  }).join('')||'<div class="empty-state"><span>★</span><strong>Noch keine Bewertungen</strong><p>Bewerte erst ein Restaurant in dieser Kategorie.</p></div>';
  document.querySelectorAll('[data-metric]').forEach(b=>{const active=b.dataset.metric===metric;b.classList.toggle('active',active);b.setAttribute('aria-pressed',String(active))});
