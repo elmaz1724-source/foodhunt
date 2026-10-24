@@ -1,0 +1,153 @@
+/* FOODHUNT V6 — micro-interactions, a refined favorite state & top-ranked spotlight */
+:root{
+  --press-ease:cubic-bezier(.2,.8,.2,1);
+}
+button,.favorite-row{touch-action:manipulation}
+button:active{ -webkit-tap-highlight-color:transparent }
+.favorite-heart{
+  isolation:isolate;
+  overflow:visible;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.04);
+  will-change:transform;
+}
+.favorite-heart.active{
+  color:#ff9f93;
+  background:linear-gradient(145deg,rgba(255,137,129,.17),rgba(255,111,103,.08));
+  border-color:rgba(255,160,145,.39);
+  box-shadow:0 4px 14px rgba(233,99,92,.08),inset 0 1px 0 rgba(255,255,255,.06);
+}
+.favorite-heart.active .heart-svg{
+  fill:currentColor;
+  filter:drop-shadow(0 2px 5px rgba(245,116,108,.19));
+}
+.favorite-heart::after{
+  content:'';
+  position:absolute;
+  inset:-7px;
+  border:2px solid rgba(255,166,138,0);
+  border-radius:22px;
+  pointer-events:none;
+  transform:scale(.83);
+}
+.favorite-heart.just-liked{
+  animation:fh-favorite-pop .38s var(--press-ease);
+}
+.favorite-heart.just-liked::after{
+  animation:fh-favorite-halo .46s ease-out;
+}
+.favorite-heart.just-liked .heart-svg{
+  animation:fh-heart-bounce .36s var(--press-ease);
+}
+@keyframes fh-favorite-pop{
+  0%{transform:scale(1)}
+  32%{transform:scale(.83)}
+  68%{transform:scale(1.14)}
+  100%{transform:scale(1)}
+}
+@keyframes fh-heart-bounce{
+  0%{transform:scale(.8) rotate(-10deg)}
+  60%{transform:scale(1.18) rotate(8deg)}
+  100%{transform:scale(1) rotate(0deg)}
+}
+@keyframes fh-favorite-halo{
+  0%{opacity:.95;border-color:rgba(255,165,137,.72);transform:scale(.85)}
+  100%{opacity:0;border-color:rgba(255,165,137,0);transform:scale(1.29)}
+}
+/* A restrained gold accent only on the leading restaurant. */
+.ranking-card:first-child{
+  position:relative;
+  isolation:isolate;
+  background:linear-gradient(142deg,rgba(239,188,110,.20) 0%,rgba(195,121,79,.095) 45%,var(--v3-card) 94%);
+  border-color:rgba(255,194,119,.45);
+  box-shadow:0 11px 30px rgba(0,0,0,.09),inset 0 1px 0 rgba(255,223,164,.10);
+}
+.ranking-card:first-child::before{
+  content:'';
+  position:absolute;
+  right:-52px;top:-85px;
+  width:180px;height:190px;
+  border-radius:50%;
+  background:radial-gradient(circle,rgba(255,195,114,.15),transparent 72%);
+  pointer-events:none;z-index:-1;
+}
+.ranking-card:first-child .rank-num{color:#f4c895;font-weight:800}
+.ranking-card:first-child .rank-icon{
+  color:#ffd18f;
+  font-size:26px;
+  text-shadow:0 0 18px rgba(252,192,108,.33);
+}
+.ranking-card:first-child .rank-score{
+  color:#ffd08e;
+  text-shadow:0 2px 15px rgba(228,143,76,.13);
+}
+.ranking-card:not(:first-child) .rank-icon{
+  color:var(--accent-strong);
+  opacity:.65;
+}
+html[data-theme="light"] .ranking-card:first-child{
+  background:linear-gradient(140deg,#fff1d9,#fff8ef 78%,var(--v3-card));
+  border-color:rgba(188,136,69,.32);
+  box-shadow:0 10px 24px rgba(155,91,45,.07);
+}
+html[data-theme="light"] .ranking-card:first-child .rank-num{color:#a46d32}
+html[data-theme="light"] .ranking-card:first-child .rank-icon,
+html[data-theme="light"] .ranking-card:first-child .rank-score{color:#a66b2f}
+html[data-theme="light"] .ranking-card:first-child::before{
+  background:radial-gradient(circle,rgba(238,168,85,.14),transparent 72%);
+}
+.filter-pill .heart-svg{
+  display:inline-block;
+  width:16px;height:16px;
+  stroke-width:2.1px;
+  flex-shrink:0;
+  vertical-align:-3px;
+  margin-left:4px;
+}
+.filter-pill.active .heart-svg{fill:currentColor}
+.mobile-nav-link:active,
+.theme-toggle:active,
+.mobile-add:active,
+.filter-pill:active,
+.metric-tab:active,
+.cat-tile:active,
+.ranking-card:active,
+.spot-card-main:active,
+.add-button:active,
+.button-dark:active,
+.button-text:active,
+.plain-link:active,
+.save-button:active,
+.spot-maps-button:active,
+.backup-action:active{
+  transform:scale(.97);
+  transition:transform .13s var(--press-ease);
+}
+.metric-tab.active:active,.filter-pill.active:active{transform:scale(.96)}
+.mobile-nav-link.selected:active{transform:scale(.94)}
+.cat-tile:active,.ranking-card:active{box-shadow:none}
+.favorite-row{transition:background .18s ease,border-color .18s ease,transform .15s ease}
+.favorite-row:active{transform:scale(.99)}
+.favorite-row:has(input:checked) .favorite-check-icon{
+  filter:drop-shadow(0 1px 4px rgba(255,137,129,.15));
+}
+.spot-card-main:active{opacity:.9}
+@media(max-width:720px){
+  .ranking-card:first-child{
+    border-color:rgba(255,194,119,.41);
+    box-shadow:0 5px 17px rgba(0,0,0,.09);
+  }
+  .ranking-card:first-child .rank-icon{font-size:25px}
+  .favorite-heart::after{border-radius:20px}
+  .filter-pill .heart-svg{width:15px;height:15px}
+}
+@media(prefers-reduced-motion:reduce){
+  .favorite-heart,.favorite-heart .heart-svg,.favorite-heart::after,
+  .favorite-heart.just-liked,.favorite-heart.just-liked::after,
+  .favorite-heart.just-liked .heart-svg,
+  .mobile-nav-link,.theme-toggle,.mobile-add,.filter-pill,
+  .metric-tab,.cat-tile,.ranking-card,.spot-card-main,
+  .add-button,.button-dark,.button-text,.plain-link,.save-button,
+  .spot-maps-button,.backup-action,.favorite-row{
+    animation:none!important;transition:none!important;
+  }
+}
