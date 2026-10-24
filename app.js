@@ -42,10 +42,10 @@ function renderCategories(){
 function renderRankings(){
  const metric=ui.ratingMetric;
  const top=spots.filter(s=>s[metric]!==null&&s[metric]!==undefined&&Number.isFinite(Number(s[metric]))).sort((a,b)=>Number(b[metric])-Number(a[metric])).slice(0,4);
- const pLabel=metric==='score'?'Geschmack':'Preis-Leistung';
+ const pLabel=metric==='score'?'Gesamtbewertung':'Preis-Leistung';
  $('topRated').innerHTML=top.map((s,i)=>{
   const secondary=metric==='score'?s.valueScore:s.score;
-  const secondaryLabel=metric==='score'?'Preis-Leistung':'Geschmack';
+  const secondaryLabel=metric==='score'?'Preis-Leistung':'Gesamtbewertung';
   return `<button type="button" class="ranking-card" data-spot="${escapeHTML(s.id)}"><span class="rank-num">#${String(i+1).padStart(2,'0')} · ${pLabel}</span><span class="rank-icon" aria-hidden="true">${i===0?'✦':'✳'}</span><span class="rank-name">${escapeHTML(s.name)}</span><span class="rank-score">${fmt(s[metric])}<small> / 10</small></span>${secondary!==null&&secondary!==undefined?`<span class="rank-secondary">${secondaryLabel}: ${fmt(secondary)}</span>`:''}</button>`;
  }).join('')||'<div class="empty-state"><span>★</span><strong>Noch keine Bewertungen</strong><p>Bewerte erst ein Restaurant in dieser Kategorie.</p></div>';
  document.querySelectorAll('[data-metric]').forEach(b=>{const active=b.dataset.metric===metric;b.classList.toggle('active',active);b.setAttribute('aria-pressed',String(active))});
@@ -74,7 +74,7 @@ function renderSpots(){
   const badge=s.visited?'<span class="spot-badge reviewed">✓ GETESTET</span>':s.suggested?'<span class="spot-badge suggested">✳ NEU</span>':'<span class="spot-badge">AUF DER LISTE</span>';
   const hasTaste=s.score!==null&&s.score!==undefined;
   const hasValue=s.valueScore!==null&&s.valueScore!==undefined;
-  const scores=(hasTaste||hasValue)?`<span class="spot-dual-ratings">${hasTaste?`<span class="mini-rating taste"><span class="mini-rating-label">★ Geschmack</span><strong>${fmt(s.score)}</strong></span>`:''}${hasValue?`<span class="mini-rating value"><span class="mini-rating-label">◈ Preis-Leistung</span><strong>${fmt(s.valueScore)}</strong></span>`:''}</span>`:`<span class="spot-status">${s.visited?'Bereits besucht':'Noch nicht getestet'}</span>`;
+  const scores=(hasTaste||hasValue)?`<span class="spot-dual-ratings">${hasTaste?`<span class="mini-rating taste"><span class="mini-rating-label">★ Gesamt</span><strong>${fmt(s.score)}</strong></span>`:''}${hasValue?`<span class="mini-rating value"><span class="mini-rating-label">◈ Preis-Leistung</span><strong>${fmt(s.valueScore)}</strong></span>`:''}</span>`:`<span class="spot-status">${s.visited?'Bereits besucht':'Noch nicht getestet'}</span>`;
   return `<article class="spot-card"><button class="spot-card-main" type="button" data-spot="${escapeHTML(s.id)}"><div class="spot-top"><span class="spot-category"><span class="emoji">${escapeHTML(c.emoji)}</span> ${escapeHTML(c.name)}</span>${badge}</div><h3>${escapeHTML(s.name)}${s.favorite?'<span class="heart-small">♥</span>':''}</h3><div class="spot-footer">${scores}<span class="spot-enter" aria-hidden="true">↗</span></div></button><a class="spot-map-link" href="${escapeHTML(mapsUrl(s))}" target="_blank" rel="noopener noreferrer" aria-label="${escapeHTML(s.name)} – ${escapeHTML(mapLabel)}"><span class="spot-map-icon" aria-hidden="true">⌖</span>${escapeHTML(mapLabel)}<span aria-hidden="true">↗</span></a></article>`;
  }).join('');
 }
