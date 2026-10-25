@@ -111,11 +111,11 @@ function renderSpots(){
 function render(){renderStats();renderSideCategories();renderCategories();renderRankings();renderSpots();document.querySelectorAll('.filter-pill').forEach(b=>b.classList.toggle('active',b.dataset.filter===ui.filter));document.querySelectorAll('.nav-link').forEach(b=>b.classList.toggle('selected',b.dataset.view===ui.view))}
 function scrollToId(id){$(id)?.scrollIntoView({behavior:'smooth',block:'start'})}
 function setCategory(id){ui.category=ui.category===id?null:id;ui.view='discover';ui.filter='all';render();scrollToId('browseSection')}
-function setView(view){ui.view=view;if(view==='home'){ui.category=null;ui.filter='all';render();scrollToId('home')}else if(view==='discover'){ui.category=null;ui.filter='all';render();scrollToId('browseSection')}else if(view==='rankings'){render();scrollToId('rankingSection')}else if(view==='visited'){ui.category=null;ui.filter='visited';render();scrollToId('browseSection')}}
+function setView(view){ui.view=view;if(view==='home'){ui.category=null;ui.filter='all';render();scrollToId('home')}else if(view==='discover'){ui.category=null;ui.filter='all';render();scrollToId('browseSection')}else if(view==='nearby'){render();scrollToId('radarSection');document.dispatchEvent(new Event('foodhunt:radar-open'))}else if(view==='rankings'){render();scrollToId('rankingSection')}else if(view==='visited'){ui.category=null;ui.filter='visited';render();scrollToId('browseSection')}}
 function openModal(type='spot',id=null){$('modalBackdrop').classList.remove('hidden');document.body.style.overflow='hidden';$('spotForm').classList.toggle('hidden',type!=='spot');$('categoryForm').classList.toggle('hidden',type!=='category');$('backupPanel').classList.toggle('hidden',type!=='backup');$('modalTitle').textContent=type==='spot'?(id?'Spot bearbeiten':'Spot hinzufügen'):type==='category'?'Neue Food-Kategorie':'Daten sichern & laden';
  if(type==='spot'){
   $('spotCategory').innerHTML=categories.map(c=>`<option value="${escapeHTML(c.id)}">${escapeHTML(c.emoji)} ${escapeHTML(c.name)}</option>`).join('');
-  const s=spots.find(x=>x.id===id);$('spotId').value=s?.id||'';$('spotName').value=s?.name||'';$('spotCategory').value=s?.category||ui.category||categories[0]?.id||'';$('spotVisited').value=String(s?.visited||false);$('spotScore').value=s?.score??'';$('spotValueScore').value=s?.valueScore??'';$('spotDish').value=s?.dish||'';$('spotNote').value=s?.note||'';$('spotAddress').value=s?.address||'';$('spotFavorite').checked=!!s?.favorite;$('deleteSpot').classList.toggle('hidden',!s);syncMapsLinks();document.dispatchEvent(new CustomEvent('foodhunt:spot-form-opened',{detail:{editing:!!s}}));if(window.innerWidth>720&&!s)$('spotName').focus();
+  const s=spots.find(x=>x.id===id);$('spotId').value=s?.id||'';$('spotName').value=s?.name||'';$('spotCategory').value=s?.category||ui.category||categories[0]?.id||'';$('spotVisited').value=String(s?.visited||false);$('spotScore').value=s?.score??'';$('spotValueScore').value=s?.valueScore??'';$('spotDish').value=s?.dish||'';$('spotNote').value=s?.note||'';$('spotAddress').value=s?.address||'';$('spotFavorite').checked=!!s?.favorite;$('spotLat').value=Number.isFinite(Number(s?.latitude))&&s?.latitude!==null&&s?.latitude!==undefined?String(s.latitude):'';$('spotLon').value=Number.isFinite(Number(s?.longitude))&&s?.longitude!==null&&s?.longitude!==undefined?String(s.longitude):'';$('deleteSpot').classList.toggle('hidden',!s);syncMapsLinks();document.dispatchEvent(new CustomEvent('foodhunt:spot-form-opened',{detail:{editing:!!s}}));if(window.innerWidth>720&&!s)$('spotName').focus();
  }else if(type==='category'){$('newCategoryName').value='';$('newCategoryEmoji').value='🍽️';$('newCategoryName').focus()}}
 function syncMapsLinks(){const name=$('spotName').value.trim(),address=$('spotAddress').value.trim();$('spotLocationBox').classList.toggle('hidden',!name);if(!name)return;const s={name,address};$('spotMapsLink').href=mapsUrl(s);$('spotMapsHint').textContent=address?'Adresse hinterlegt – bitte den Treffer prüfen':'Ohne Adresse: Suche nach dem Namen in Hamburg';$('spotDirectionsLink').classList.toggle('hidden',!address);if(address)$('spotDirectionsLink').href=directionsUrl(s)}
 function closeModal(){$('modalBackdrop').classList.add('hidden');document.body.style.overflow=''}
@@ -139,13 +139,17 @@ function saveSpot(e){
  if(valueScore!==null&&(!Number.isFinite(valueScore)||valueScore<0||valueScore>10))return toast('Preis-Leistung muss zwischen 0 und 10 liegen');
  let legacyScore=prev?.legacyScore??null;
  if(stats.ratedCount&&legacyScore===null&&!Array.isArray(prev?.products)&&prev?.score!==null&&prev?.score!==undefined&&Number.isFinite(Number(prev.score)))legacyScore=Number(prev.score);
+ const latText=$('spotLat').value.trim(),lonText=$('spotLon').value.trim();
+ if((latText==='')!==(lonText===''))return toast('Standort bitte vollständig auswählen');
+ const latitude=latText===''?null:Number(latText),longitude=lonText===''?null:Number(lonText);
+ if(latitude!==null&&(!Number.isFinite(latitude)||!Number.isFinite(longitude)||latitude < -90||latitude>90||longitude < -180||longitude>180))return toast('Ungültige Koordinaten');
  const entry={
   id:prev?.id||('custom-'+Date.now()+'-'+Math.random().toString(36).slice(2,6)),
   name,category:categoryId,score,valueScore,
   visited:$('spotVisited').value==='true'||score!==null||valueScore!==null||products.length>0,
   suggested:prev?.suggested||false,favorite:$('spotFavorite').checked,
   dish:$('spotDish').value.trim(),note:$('spotNote').value.trim(),
-  address:$('spotAddress').value.trim(),addedAt:prev?.addedAt||new Date().toISOString().slice(0,10),
+  address:$('spotAddress').value.trim(),latitude,longitude,addedAt:prev?.addedAt||new Date().toISOString().slice(0,10),
   products:products.map(cleanProduct),legacyScore
  };
  if(prev)spots=spots.map(s=>s.id===id?entry:s);else spots.unshift(entry);

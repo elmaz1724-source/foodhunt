@@ -25,12 +25,15 @@
   <link rel="stylesheet" href="v7.css" />
   <link rel="stylesheet" href="v8.css" />
   <link rel="stylesheet" href="v9.css" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+  <link rel="stylesheet" href="v10.css" />
   <script defer src="seed.js"></script>
   <script defer src="app.js"></script>
   <script defer src="theme.js"></script>
   <script defer src="v7.js"></script>
   <script defer src="v8.js"></script>
   <script defer src="v9.js"></script>
+  <script defer src="v10.js"></script>
   <script>
     if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.hostname === 'localhost')) {
       window.addEventListener('load', () => navigator.serviceWorker.register('./sw.js').catch(() => {}));
@@ -48,6 +51,7 @@
     <nav class="main-nav" aria-label="Hauptnavigation">
       <button class="nav-link selected" data-view="home"><span>▦</span> Übersicht</button>
       <button class="nav-link" data-view="discover"><span>◈</span> Entdecken</button>
+      <button class="nav-link" data-view="nearby"><span>⌖</span> In der Nähe</button>
       <button class="nav-link" data-view="rankings"><span>★</span> Rankings</button>
       <button class="nav-link" data-view="visited"><span>✓</span> Getestet</button>
       <button class="nav-link mobile-backup" id="navBackup" type="button"><span>⇩</span> Backup</button>
@@ -85,6 +89,32 @@
   <div class="next-bite-copy"><span class="next-bite-kicker">✦ PICK OF THE DAY</span><h2 id="nextBiteTitle">Dein nächster <em>Bite.</em></h2><p>Ein Spot aus deiner Liste, den du noch entdecken kannst.</p></div>
   <div class="next-bite-card" id="nextBiteCard" aria-live="polite"></div>
 </section>
+<section class="radar-section" id="radarSection" aria-labelledby="radarHeading">
+  <div class="radar-header">
+    <div><div class="overline">NEW / FOODHUNT RADAR</div><h2 id="radarHeading">Hungry? <em>Look around.</em></h2><p>Deine gespeicherten Spots. Deine Ratings. Entdecke, was sich in deiner Nähe lohnt.</p></div>
+    <span class="radar-brand-icon" aria-hidden="true">⌖</span>
+  </div>
+  <div class="radar-controls">
+    <button id="radarLocate" class="radar-locate" type="button"><span aria-hidden="true">◎</span> Standort verwenden</button>
+    <div class="radar-radius"><label for="radarRadius">Umkreis</label><select id="radarRadius"><option value="0.5">500 m</option><option value="1">1 km</option><option value="2" selected>2 km</option><option value="5">5 km</option><option value="10">10 km</option><option value="25">25 km</option></select></div>
+    <div class="radar-sort"><label for="radarSort">Sortieren</label><select id="radarSort"><option value="nearby">Nächste zuerst</option><option value="rating">Beste Gesamtwertung</option><option value="value">Beste Preis-Leistung</option></select></div>
+    <div class="radar-category"><label for="radarCategory">Kategorie</label><select id="radarCategory"><option value="">Alle Kategorien</option></select></div>
+  </div>
+  <p id="radarStatus" class="radar-status" role="status" aria-live="polite">Erlaube deinen Standort, um Spots aus deiner Liste in der Nähe zu finden. Dein Standort wird nicht gespeichert.</p>
+  <div class="radar-body">
+    <div class="radar-map-shell">
+      <div id="radarMap" class="radar-map" role="region" aria-label="Karte mit deinen FOODHUNT-Spots"></div>
+      <div id="radarMapCover" class="radar-map-cover"><span aria-hidden="true">🗺️</span><strong>Dein Food-Radar</strong><p>Die Karte startet, sobald du deinen Standort freigibst.</p></div>
+      <div class="radar-map-caption">Kartendaten © OpenStreetMap-Mitwirkende · <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer">Lizenz</a></div>
+    </div>
+    <div class="radar-results-panel">
+      <div class="radar-results-head"><strong>In deiner Nähe</strong><span id="radarCount">0 Spots</span></div>
+      <div id="radarResults" class="radar-results" aria-live="polite"><div class="radar-zero"><span aria-hidden="true">⌖</span><strong>Hier erscheinen deine Food-Spots</strong><p>Verbinde zuerst die Standorte deiner Restaurants. Du brauchst dafür keine kostenpflichtige API.</p></div></div>
+    </div>
+  </div>
+  <div class="radar-enrich"><div><strong>Deine Restaurants auf die Karte bringen</strong><p id="radarMissingInfo">Noch keine Restaurants mit verifiziertem Standort.</p></div><button type="button" id="radarAssignSpot">Standort ergänzen ↗</button></div>
+  <p class="radar-privacy"><span aria-hidden="true">⌁</span> Dein GPS-Standort wird nur nach Zustimmung abgefragt und nicht dauerhaft gespeichert. Für die Karte werden Kartenkacheln von OpenStreetMap geladen; manuelle Restaurant-Suchen fragen Nominatim ab. Bestätigte Restaurantkoordinaten bleiben lokal auf deinem Gerät. Öffnungszeiten und öffentliche Ratings sind noch nicht verfügbar.</p>
+</section>
     <section class="categories-section" id="categorySection"><div class="section-header"><div><div class="overline">01 / WHAT ARE YOU CRAVING?</div><h2>Pick your <em>craving.</em></h2></div><button class="plain-link" id="addCategoryButton">＋ Kategorie erstellen</button></div><div id="categoryTiles" class="category-tiles"></div></section>
     <section class="rankings-section" id="rankingSection"><div class="section-header"><div><div class="overline">02 / YOUR PERSONAL HALL OF FAME</div><h2>Die <em>Legenden.</em></h2></div><div class="legend">Deine Lieblingsspots auf einen Blick.</div></div><div class="metric-tabs" id="ratingMetricTabs" role="group" aria-label="Ranking nach Bewertung auswählen"><button type="button" class="metric-tab active" data-metric="score" aria-pressed="true"><span aria-hidden="true">★</span> Gesamt</button><button type="button" class="metric-tab" data-metric="valueScore" aria-pressed="false"><span aria-hidden="true">◈</span> Preis-Leistung</button><button type="button" class="metric-tab" data-metric="products" aria-pressed="false"><span aria-hidden="true">🍔</span> Top-Gerichte</button></div><div id="topRated" class="ranking-grid"></div></section>
     <section class="browse-section" id="browseSection"><div class="section-header browse-title"><div><div class="overline">03 / THE FULL HIT LIST</div><h2>Alle <em>Food-Spots.</em></h2></div><button class="plain-link" id="addSpotSection">＋ Neuen Spot eintragen</button></div>
@@ -95,7 +125,7 @@
     <footer>FOOD<span>HUNT.</span><span>HAMBURG FOOD ARCHIVE · BUILT FOR THE NEXT BITE · 2026</span><span>MADE WITH APPETITE ✳</span></footer>
   </main>
 </div>
-<nav class="mobile-bottom-nav" aria-label="Mobile Navigation"><button class="mobile-nav-link selected" data-view="home" type="button"><span class="mobile-nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="m3 10 9-7 9 7v10a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1Z"/></svg></span>Home</button><button class="mobile-nav-link" data-view="discover" type="button"><span class="mobile-nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m16 16 5 5"/></svg></span>Entdecken</button><button class="mobile-nav-link" data-view="rankings" type="button"><span class="mobile-nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="m12 2 3.2 6.5 7.2 1-5.2 5 .95 7.1L12 18.2 5.85 21.6l.95-7.1-5.2-5 7.2-1Z"/></svg></span>Rankings</button><button class="mobile-nav-link" data-view="visited" type="button"><span class="mobile-nav-icon heart-nav-icon" aria-hidden="true"><svg class="heart-svg" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78Z"/></svg></span>Getestet</button></nav>
+<nav class="mobile-bottom-nav" aria-label="Mobile Navigation"><button class="mobile-nav-link selected" data-view="home" type="button"><span class="mobile-nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="m3 10 9-7 9 7v10a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1Z"/></svg></span>Home</button><button class="mobile-nav-link" data-view="discover" type="button"><span class="mobile-nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m16 16 5 5"/></svg></span>Entdecken</button><button class="mobile-nav-link" data-view="nearby" type="button"><span class="mobile-nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="2"/><path d="M12 3v3m0 12v3M3 12h3m12 0h3"/><circle cx="12" cy="12" r="8"/></svg></span>Radar</button><button class="mobile-nav-link" data-view="rankings" type="button"><span class="mobile-nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="m12 2 3.2 6.5 7.2 1-5.2 5 .95 7.1L12 18.2 5.85 21.6l.95-7.1-5.2-5 7.2-1Z"/></svg></span>Rankings</button><button class="mobile-nav-link" data-view="visited" type="button"><span class="mobile-nav-icon heart-nav-icon" aria-hidden="true"><svg class="heart-svg" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78Z"/></svg></span>Getestet</button></nav>
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 <div class="modal-backdrop hidden" id="modalBackdrop" role="presentation">
  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle"><div class="modal-head"><div><div class="overline">FOODHUNT / DEIN FOOD JOURNAL</div><h3 id="modalTitle">Spot hinzufügen</h3><p class="modal-subtitle">Dein nächster Lieblingsbiss – festgehalten.</p></div><button id="closeModal" class="icon-button" aria-label="Schließen">✕</button></div>
@@ -109,7 +139,13 @@
       </div>
       <details class="review-more-info">
         <summary><span class="more-info-symbol" aria-hidden="true">⌖</span> Adresse hinzufügen <span class="optional-chip">Optional</span><span class="details-arrow" aria-hidden="true">⌄</span></summary>
-        <label class="review-field"><span class="field-title">Standort</span><input id="spotAddress" maxlength="180" placeholder="Straße und Ort" autocomplete="street-address" /></label>
+        <label class="review-field"><span class="field-title">Standort</span><input id="spotAddress" maxlength="180" placeholder="Straße und Ort" autocomplete="street-address" /></label><div class="radar-spot-location">
+ <input type="hidden" id="spotLat" /><input type="hidden" id="spotLon" />
+ <div class="radar-location-actions"><button type="button" id="spotGeocode" class="radar-find-button">⌕ Standort suchen</button><button type="button" id="spotUseGps" class="radar-at-button">◎ Ich bin direkt hier</button></div>
+ <p id="spotLocationStatus" class="radar-location-status" aria-live="polite">Damit dieses Restaurant auf der Karte erscheint, wähle einen bestätigten Standort. Die Suche wird nur durch einen Fingertipp gestartet.</p>
+ <div id="spotLocationMatches" class="radar-location-matches hidden"></div>
+ <button type="button" id="spotClearLocation" class="radar-clear-location hidden">Gespeicherten Kartenstandort entfernen</button>
+ </div>
       </details>
     </section>
     <section class="review-form-section review-visit-section" aria-labelledby="reviewVisitHeading">
