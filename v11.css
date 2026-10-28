@@ -1,0 +1,90 @@
+/* FOODHUNT V11 — Nearby discovery & provenance */
+.radar-section .radar-controls{
+ grid-template-columns:minmax(190px,1.2fr) repeat(4,minmax(105px,1fr));
+ gap:10px;
+}
+.radar-section .radar-controls .radar-locate{white-space:normal;line-height:1.25}
+.radar-source select{color:var(--ink)}
+.radar-discovery-row{
+ display:flex;justify-content:space-between;align-items:center;
+ gap:9px;padding:10px 13px;
+ background:var(--surface);
+ border-bottom:1px solid var(--v3-border);
+}
+.radar-discovery-status{
+ color:var(--muted);font:600 10px/1.5 var(--font);
+ flex:1;min-width:0;
+}
+.radar-discovery-status[data-mode="loading"]{color:var(--accent-strong)}
+.radar-discovery-status[data-mode="success"]{color:#add4b2}
+.radar-discovery-status[data-mode="warning"]{color:#f0b6a2}
+.radar-retry{
+ flex:0 0 auto;min-height:31px;
+ padding:6px 9px;
+ border-radius:9px;border:1px solid var(--v3-border);
+ background:var(--surface-2);
+ color:var(--accent-strong);font:750 10px/1.2 var(--font);
+ cursor:pointer;
+}
+.radar-retry:disabled{opacity:.45;cursor:not-allowed}
+.radar-result-topline{
+ display:flex;justify-content:space-between;align-items:center;
+ gap:7px;margin-bottom:6px;flex-wrap:wrap;
+}
+.radar-result-topline>span:last-child{
+ color:var(--muted);font:750 10px var(--font);
+}
+.radar-source-badge{
+ display:inline-flex;padding:4px 6px;border-radius:6px;
+ font:850 8px/1.2 var(--font);letter-spacing:.07em;
+}
+.radar-source-badge.is-external{
+ background:rgba(178,203,174,.13);
+ color:#bedcb9;
+ border:1px solid rgba(172,211,170,.22);
+}
+.radar-source-badge.is-mine{
+ background:rgba(255,174,117,.13);
+ color:var(--accent-strong);
+ border:1px solid rgba(255,186,130,.22);
+}
+.radar-result-external{background:linear-gradient(115deg,rgba(180,209,175,.035),var(--surface))}
+.radar-result-external .radar-result-ratings span{color:var(--muted)}
+.radar-link-hint{
+ margin:8px 0 0;
+ font:600 10px/1.45 var(--font);
+ color:var(--accent-strong);
+}
+.radar-result-external .radar-result-actions [data-discover-save],
+.radar-result-external .radar-result-actions [data-discover-link]{
+ background:rgba(173,207,167,.14);
+ color:#bcd9b5;
+ border-color:rgba(173,207,167,.26);
+}
+html[data-theme="light"] .radar-source-badge.is-external,
+html[data-theme="light"] .radar-result-external .radar-result-actions button{
+ color:#517351;
+}
+html[data-theme="light"] .radar-discovery-status[data-mode="success"]{color:#54805a}
+html[data-theme="light"] .radar-discovery-status[data-mode="warning"]{color:#a16a4b}
+.radar-privacy{max-width:100%;line-height:1.55}
+@media(max-width:1250px){
+ .radar-section .radar-controls{grid-template-columns:repeat(4,minmax(0,1fr))}
+ .radar-section .radar-controls .radar-locate{grid-column:span 4}
+}
+@media(max-width:720px){
+ .radar-section .radar-controls{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}
+ .radar-section .radar-controls .radar-locate{grid-column:span 2}
+ .radar-section .radar-controls .radar-category,
+ .radar-section .radar-controls .radar-source{grid-column:span 1}
+ .radar-discovery-row{padding:10px 11px;gap:8px}
+ .radar-discovery-status{font-size:10px;line-height:1.5}
+ .radar-retry{font-size:9px;padding:7px 8px;min-height:32px}
+ .radar-result{gap:9px}
+ .radar-source-badge{font-size:8px}
+}
+@media(max-width:360px){
+ .radar-section .radar-controls .radar-category,
+ .radar-section .radar-controls .radar-source{grid-column:span 2}
+ .radar-discovery-row{flex-direction:column;align-items:flex-start}
+}

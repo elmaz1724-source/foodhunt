@@ -13,6 +13,7 @@ const format=n=>Number(n).toFixed(1).replace('.',',');
 const getData=()=>window.FOODHUNT_API.getSpots();
 const getCategories=()=>window.FOODHUNT_API.getCategories();
 let position=null,map=null,markerLayer=null,userMarker=null,radiusCircle=null,loadPromise=null,lastGeocode=0,geocoding=false,geocodeMatches=[];
+let discovered=[],discoverLoading=false,lastDiscovery=null,discoverBackoffUntil=0,requestSerial=0,discoverTimer=null;
 const status=(message,mode='')=>{const e=$('radarStatus');e.textContent=message;e.dataset.mode=mode};
 const marked=s=>valid(s.latitude,s.longitude);
 const radius=()=>Number($('radarRadius').value)||2;
@@ -36,32 +37,127 @@ function available(){
  }
  $('radarAssignSpot').disabled=!missing.length;
 }
+/* V11: a light, user-triggered OpenStreetMap discovery layer. */
+const sourceMode=()=>$('radarSource')?.value||'all';
+const possibleSavedMatch=place=>{const matches=getData().filter(s=>!marked(s)&&normalizeName(s.name)===normalizeName(place.name));return matches.length===1?matches[0]:null;};
+const normalizeName=value=>String(value||'').normalize('NFKD').replace(/[\u0300-\u036f]/g,'').toLocaleLowerCase('de').replace(/[^a-z0-9]/g,'');
+const classify=tags=>{
+ const c=String(tags.cuisine||'').toLowerCase(),amenity=String(tags.amenity||'').toLowerCase(),shop=String(tags.shop||'').toLowerCase();
+ if(/burger|american/.test(c))return 'burger';
+ if(/kebab|doner|turkish/.test(c))return 'doener';
+ if(/shawarma|lebanese|arab/.test(c))return 'shawarma';
+ if(/pizza|italian/.test(c))return 'pizza';
+ if(/chicken|korean/.test(c))return 'chicken';
+ if(/ramen/.test(c))return 'ramen';
+ if(/sushi|japanese|thai|vietnamese|chinese|asian/.test(c))return 'asian';
+ if(/steak|grill/.test(c))return 'steak';
+ if(/albanian/.test(c))return 'albanian';
+ if(/balkan|serbian|bosnian|croatian/.test(c))return 'balkan';
+ if(/ice_cream|dessert|coffee|cake/.test(c)||shop==='pastry')return 'desserts';
+ if(amenity==='cafe'||shop==='bakery')return 'desserts';
+ if(amenity==='food_court')return 'street';
+ return 'street';
+};
+const discoveryStatus=(message,mode='')=>{const e=$('radarDiscoveryStatus');if(e){e.textContent=message;e.dataset.mode=mode}};
+function collectMatches(){
+ if(!position)return [];
+ const all=getData(),owned=all.filter(marked);
+ const knownIds=new Set(owned.map(x=>String(x.osmId||'')));
+ const fresh=discovered.filter(x=>{
+  if(knownIds.has(x.osmId))return false;
+  return !owned.some(y=>normalizeName(y.name)===normalizeName(x.name)&&distance(Number(y.latitude),Number(y.longitude),Number(x.latitude),Number(x.longitude))<.12);
+ });
+ let items=sourceMode()==='mine'?owned.map(spot=>({spot,external:false})):
+ sourceMode()==='discover'?fresh.map(spot=>({spot,external:true})):
+ [...owned.map(spot=>({spot,external:false})),...fresh.map(spot=>({spot,external:true}))];
+ const selectedCategory=$('radarCategory').value,km=radius();
+ items=items.map(x=>({...x,km:distance(position.lat,position.lon,Number(x.spot.latitude),Number(x.spot.longitude))})).filter(x=>x.km<=km&&(!selectedCategory||x.spot.category===selectedCategory));
+ const sort=$('radarSort').value;
+ const val=x=>x.external?-1:sort==='value'?Number(x.spot.valueScore??-1):rating(x.spot)??-1;
+ items.sort((a,b)=>sort==='nearby'?a.km-b.km:val(b)-val(a)||a.km-b.km);
+ return items.slice(0,110);
+}
 function showResults(){
- const list=$('radarResults'),spots=getData(),cats=new Map(getCategories().map(c=>[c.id,c]));
- const mapped=spots.filter(marked),count=mapped.length;
+ const list=$('radarResults'),mapped=getData().filter(marked),cats=new Map(getCategories().map(c=>[c.id,c]));
  if(!position){
-  $('radarCount').textContent=count+' zugeordnet';
-  list.innerHTML='<div class="radar-zero"><span aria-hidden="true">◎</span><strong>Wo bist du gerade?</strong><p>Tippe auf „Standort verwenden“. Erst dann berechnen wir Entfernungen – dein GPS-Standort wird nicht gespeichert.</p></div>';
+  $('radarCount').textContent=mapped.length+' zugeordnet';
+  list.innerHTML='<div class="radar-zero"><span aria-hidden="true">◎</span><strong>Wo bist du gerade?</strong><p>Tippe auf „Standort verwenden“. FOODHUNT findet dann auch Restaurants aus öffentlichen Kartendaten in deiner Nähe.</p></div>';
   available();return [];
  }
- const selectedCategory=$('radarCategory').value,km=radius();
- let matches=mapped.map(s=>({spot:s,km:distance(position.lat,position.lon,Number(s.latitude),Number(s.longitude))})).filter(({spot,km:d})=>d<=km&&(!selectedCategory||spot.category===selectedCategory));
- const sort=$('radarSort').value;
- matches.sort((a,b)=>sort==='rating'?((rating(b.spot)??-1)-(rating(a.spot)??-1)||a.km-b.km):sort==='value'?((Number(b.spot.valueScore??-1)-Number(a.spot.valueScore??-1))||a.km-b.km):a.km-b.km);
- $('radarCount').textContent=matches.length+' Spot'+(matches.length===1?'':'s');
+ const matches=collectMatches();
+ $('radarCount').textContent=matches.length+(matches.length===110?'+':'')+' Spot'+(matches.length===1?'':'s');
  if(!matches.length){
-  list.innerHTML='<div class="radar-zero"><span aria-hidden="true">⌖</span><strong>Hier ist noch Luft nach oben</strong><p>In diesem Umkreis gibt es noch keine deiner Restaurants mit gespeichertem Standort. Erhöhe den Radius oder füge einen Standort hinzu.</p></div>';
+  const hint=discoverLoading?'Restaurants in deiner Umgebung werden geladen …':sourceMode()==='mine'?'Du hast hier noch keine Restaurants mit gespeicherten Koordinaten. Wähle „Alle Food-Spots“, um öffentliche Restaurants zu sehen.':'Keine passenden Spots gefunden. Erhöhe den Radius, ändere die Kategorie oder probiere die Suche später erneut.';
+  list.innerHTML='<div class="radar-zero"><span aria-hidden="true">⌖</span><strong>'+ (discoverLoading?'Die Food-Suche läuft':'Hier ist noch Platz für gutes Essen') +'</strong><p>'+safe(hint)+'</p></div>';
  }else{
-  list.innerHTML=matches.map(({spot:s,km:d},i)=>{
-    const category=cats.get(s.category)||{name:'Food',emoji:'🍽️'};
-    const r=rating(s),v=(s.valueScore===null||s.valueScore===undefined)?null:Number(s.valueScore);
-    const products=Array.isArray(s.products)?s.products.filter(p=>p&&p.name&&p.score!==null&&p.score!==undefined&&Number.isFinite(Number(p.score))):[];
-    const best=products.length?[...products].sort((a,b)=>Number(b.score)-Number(a.score))[0]:null;
-    const nav='https://www.google.com/maps/dir/?api=1&destination='+encodeURIComponent(Number(s.latitude)+','+Number(s.longitude));
-    return '<article class="radar-result"><div class="radar-result-icon">'+safe(category.emoji)+'</div><div class="radar-result-body"><span class="radar-result-meta">'+safe(category.name)+' · '+meters(d)+'</span><strong>'+safe(s.name)+'</strong><div class="radar-result-ratings">'+(r!==null?'<span>★ '+format(r)+'</span>':'<span>Noch nicht bewertet</span>')+(v!==null&&Number.isFinite(v)?'<span>◈ '+format(v)+'</span>':'')+'</div>'+(best?'<p class="radar-best">✦ Bester Bite: '+safe(best.name)+' · '+format(best.score)+'</p>':'')+'<div class="radar-result-actions"><button type="button" data-radar-spot="'+safe(s.id)+'">Details</button><a href="'+safe(nav)+'" target="_blank" rel="noopener noreferrer">Route ↗</a></div></div></article>';
+  list.innerHTML=matches.map(({spot:s,km:d,external})=>{
+   const category=cats.get(s.category)||{name:'Food',emoji:'🍽️'};
+   const r=external?null:rating(s);
+   const v=external||s.valueScore===null||s.valueScore===undefined?null:Number(s.valueScore);
+   const products=external?[]:(Array.isArray(s.products)?s.products.filter(p=>p&&p.name&&p.score!==null&&p.score!==undefined&&Number.isFinite(Number(p.score))):[]);
+   const best=products.length?[...products].sort((a,b)=>Number(b.score)-Number(a.score))[0]:null;
+   const nav='https://www.google.com/maps/dir/?api=1&destination='+encodeURIComponent(Number(s.latitude)+','+Number(s.longitude));
+   const linkCandidate=external?possibleSavedMatch(s):null;
+   const detail=external?'<span class="radar-source-badge is-external">OPENSTREETMAP</span>':'<span class="radar-source-badge is-mine">MEINE LISTE</span>';
+   const scoreLine=external?'<span>Keine FOODHUNT-Bewertung</span>':(r!==null?'<span>★ Meine Note: '+format(r)+'</span>':'<span>Noch nicht bewertet</span>')+(v!==null&&Number.isFinite(v)?'<span>◈ '+format(v)+'</span>':'');
+   const action=external?(linkCandidate?'<button type="button" data-discover-link="'+safe(s.osmId)+'" data-target-spot="'+safe(linkCandidate.id)+'">↗ Zuordnen</button>':'<button type="button" data-discover-save="'+safe(s.osmId)+'">＋ Merken</button>'):'<button type="button" data-radar-spot="'+safe(s.id)+'">Details</button>';
+   return '<article class="radar-result'+(external?' radar-result-external':'')+'"><div class="radar-result-icon">'+safe(category.emoji)+'</div><div class="radar-result-body"><div class="radar-result-topline">'+detail+'<span>'+meters(d)+'</span></div><strong>'+safe(s.name)+'</strong><div class="radar-result-ratings">'+scoreLine+'</div>'+ (linkCandidate?'<p class="radar-link-hint">Passt möglicherweise zu deinem gespeicherten Spot. Standort bestätigen.</p>':'')+(best?'<p class="radar-best">✦ Bester Bite: '+safe(best.name)+' · '+format(best.score)+'</p>':'')+'<div class="radar-result-actions">'+action+'<a href="'+safe(nav)+'" target="_blank" rel="noopener noreferrer">Route ↗</a></div></div></article>';
   }).join('');
  }
  available();return matches;
+}
+function parseOsmElements(data){
+ const arr=Array.isArray(data?.elements)?data.elements:[];
+ const seen=new Set();
+ return arr.map(e=>{
+  const t=e.tags||{},lat=Number(e.lat??e.center?.lat),lon=Number(e.lon??e.center?.lon),name=String(t.name||'').trim().slice(0,100);
+  if(!name||!valid(lat,lon))return null;
+  const osmId=String(e.type)+'/'+String(e.id);
+  if(seen.has(osmId))return null;
+  seen.add(osmId);
+  return {id:'external-'+String(e.type)+'-'+String(e.id),osmId,name,category:classify(t),latitude:lat,longitude:lon,score:null,valueScore:null,external:true,source:'openstreetmap'};
+ }).filter(Boolean);
+}
+async function fetchNearby({force=false}={}){
+ if(!position||discoverLoading)return;
+ const target=Math.min(radius(),5);
+ if(!force&&lastDiscovery&&Date.now()-lastDiscovery.time<15*60*1000&&lastDiscovery.radius>=target&&distance(position.lat,position.lon,lastDiscovery.lat,lastDiscovery.lon)<.35){
+  discoveryStatus(discovered.length+' neue Restaurants über OpenStreetMap gefunden (zwischengespeichert).','success');
+  renderAll();return;
+ }
+ if(Date.now()<discoverBackoffUntil){
+  discoveryStatus('Der kostenlose Kartendienst ist gerade ausgelastet. Bitte später erneut versuchen. Deine gespeicherten Spots bleiben verfügbar.','warning');return;
+ }
+ discoverLoading=true;
+ $('radarRetry').disabled=true;
+ const requestedAt={lat:position.lat,lon:position.lon};
+ const ticket=++requestSerial;
+ discoveryStatus('Suche Restaurants in deiner Umgebung …','loading');
+ showResults();
+ const controller=new AbortController();
+ const timeout=setTimeout(()=>controller.abort(),22000);
+ try{
+  // Public Overpass is a small-use prototype source, not a production-grade backend.
+  const query='[out:json][timeout:18];(nwr(around:'+Math.round(target*1000)+','+position.lat.toFixed(5)+','+position.lon.toFixed(5)+')['+'"amenity"~"^(restaurant|fast_food|cafe|food_court|ice_cream)$"'+']['+'"name"'+'];nwr(around:'+Math.round(target*1000)+','+position.lat.toFixed(5)+','+position.lon.toFixed(5)+')['+'"shop"~"^(bakery|pastry)$"'+']['+'"name"'+'];);out center 800;';
+  const url='https://overpass-api.de/api/interpreter?data='+encodeURIComponent(query);
+  const response=await fetch(url,{signal:controller.signal,headers:{'Accept':'application/json'}});
+  if(response.status===429||response.status===503||response.status===504){discoverBackoffUntil=Date.now()+60000;throw new Error('OpenStreetMap ist zurzeit ausgelastet. Bitte in einer Minute erneut versuchen.')}
+  if(!response.ok)throw new Error('Restaurants konnten gerade nicht geladen werden (HTTP '+response.status+').');
+  const data=await response.json();
+  if(ticket!==requestSerial)return;
+  discovered=parseOsmElements(data);
+  lastDiscovery={lat:requestedAt.lat,lon:requestedAt.lon,radius:target,time:Date.now()};
+  const cap=radius()>5?' Für neue Restaurants ist die Suche vorerst auf 5 km begrenzt; deine eigenen Spots werden im gesamten gewählten Radius angezeigt.':'';
+  discoveryStatus(discovered.length+' Restaurants aus OpenStreetMap gefunden. Öffentliche Bewertungen und Öffnungszeiten stehen noch nicht zur Verfügung.'+cap,'success');
+ }catch(e){
+  if(ticket!==requestSerial)return;
+  discoveryStatus(e.name==='AbortError'?'Die Kartensuche hat zu lange gedauert. Bitte erneut versuchen.':(e.message||'Die Restaurant-Suche ist derzeit nicht verfügbar.')+' Deine eigenen Spots bleiben sichtbar.','warning');
+ }finally{
+  clearTimeout(timeout);
+  discoverLoading=false;
+  $('radarRetry').disabled=!position;
+  if(ticket===requestSerial)renderAll();
+ }
 }
 function mapLoad(){
  if(window.L)return Promise.resolve(window.L);
@@ -130,16 +226,37 @@ $('radarLocate').addEventListener('click',()=>{
  status('Standort wird abgefragt …');
  getGps(p=>{
   position=p;
+  $('radarRetry').disabled=false;
   b.disabled=false;b.innerHTML='<span aria-hidden="true">◎</span> Standort aktualisieren';
-  status('Standort erkannt · Genauigkeit etwa '+Math.round(p.accuracy)+' m. Angezeigt werden nur Restaurants mit bestätigten Koordinaten.','success');
+  status('Standort erkannt · Genauigkeit etwa '+Math.round(p.accuracy)+' m. Wir suchen jetzt auch nach neuen Restaurants in der Umgebung.','success');
   renderAll();
+  fetchNearby();
  });
 });
-for(const id of ['radarRadius','radarSort','radarCategory'])$(id).addEventListener('change',renderAll);
+for(const id of ['radarSort','radarCategory','radarSource'])$(id).addEventListener('change',renderAll);
+$('radarRadius').addEventListener('change',()=>{renderAll();if(position)fetchNearby();});
 $('radarResults').addEventListener('click',e=>{
  const spot=e.target.closest('[data-radar-spot]');
- if(spot)window.FOODHUNT_API.openSpot(spot.dataset.radarSpot);
+ if(spot){window.FOODHUNT_API.openSpot(spot.dataset.radarSpot);return;}
+ const link=e.target.closest('[data-discover-link]');
+ if(link){
+  const place=discovered.find(x=>x.osmId===link.dataset.discoverLink),target=getData().find(x=>x.id===link.dataset.targetSpot);
+  if(!place||!target)return;
+  if(!window.confirm('Ist „'+place.name+'“ genau das Restaurant aus deiner Liste „'+target.name+'“? Nur bestätigen, wenn der Standort stimmt.'))return;
+  const result=window.FOODHUNT_API.assignDiscoveredToSpot(place,target.id);
+  discoveryStatus(result?.assigned?'Der Standort wurde deinem vorhandenen Restaurant zugeordnet. Deine Bewertungen bleiben erhalten.':'Der Standort konnte nicht zugeordnet werden.','success');
+  renderAll();return;
+ }
+ const save=e.target.closest('[data-discover-save]');
+ if(save){
+  const place=discovered.find(x=>x.osmId===save.dataset.discoverSave);
+  if(!place)return;
+  const result=window.FOODHUNT_API.addDiscoveredSpot(place);
+  if(result?.added){discoveryStatus('„'+place.name+'“ wurde zu deiner persönlichen Liste hinzugefügt. Du kannst es jetzt selbst bewerten.','success');renderAll()}
+  else discoveryStatus('Dieser Spot ist bereits in deiner Liste vorhanden.','success');
+ }
 });
+$('radarRetry').addEventListener('click',()=>fetchNearby({force:true}));
 const catselect=$('radarCategory');
 for(const cat of getCategories()){
  const o=document.createElement('option');o.value=cat.id;o.textContent=cat.emoji+' '+cat.name;catselect.appendChild(o);
@@ -235,7 +352,7 @@ document.addEventListener('foodhunt:spot-form-opened',()=>{
 });
 document.addEventListener('foodhunt:datachange',renderAll);
 document.addEventListener('foodhunt:radar-open',()=>{
- if(position)renderAll();else available();
+ if(position){renderAll();if(!lastDiscovery)fetchNearby()}else available();
 });
 available();
 showResults();

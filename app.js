@@ -188,6 +188,37 @@ function surprise(){const pool=spots.filter(s=>!s.visited&&(ui.category?ui.categ
 $('todayDate').textContent=new Intl.DateTimeFormat('de-DE',{day:'2-digit',month:'short',year:'numeric'}).format(new Date()).toUpperCase();
 document.addEventListener('click',e=>{const favorite=e.target.closest('[data-favorite]');if(favorite){toggleFavorite(favorite.dataset.favorite,favorite);return}const nav=e.target.closest('[data-view]');if(nav){setView(nav.dataset.view);return}const cat=e.target.closest('[data-category]');if(cat){setCategory(cat.dataset.category);return}const spot=e.target.closest('[data-spot]');if(spot){openModal('spot',spot.dataset.spot);return}});
 $('addSpotTop').onclick=() =>openModal('spot');$('addSpotSection').onclick=()=>openModal('spot');$('emptyAdd').onclick=()=>openModal('spot');$('addCategoryButton').onclick=()=>openModal('category');$('quickCategory').onclick=()=>openModal('category');$('backupButton').onclick=()=>openModal('backup');$('exploreButton').onclick=()=>setView('discover');$('surpriseButton').onclick=surprise;$('closeModal').onclick=closeModal;$('modalBackdrop').addEventListener('click',e=>{if(e.target===$('modalBackdrop'))closeModal()});document.addEventListener('keydown',e=>{if(e.key==='Escape')closeModal()});$('spotName').addEventListener('input',syncMapsLinks);$('spotAddress').addEventListener('input',syncMapsLinks);$('ratingMetricTabs').addEventListener('click',e=>{const button=e.target.closest('[data-metric]');if(!button)return;ui.ratingMetric=['score','valueScore','products'].includes(button.dataset.metric)?button.dataset.metric:'score';renderRankings()});$('spotForm').addEventListener('submit',saveSpot);$('categoryForm').addEventListener('submit',addCategory);$('deleteSpot').onclick=removeSpot;$('exportData').onclick=backup;$('importData').addEventListener('change',importBackup);$('searchInput').addEventListener('input',e=>{ui.search=e.target.value;renderSpots()});$('sortSelect').addEventListener('change',e=>{ui.sort=e.target.value;renderSpots()});$('quickFilters').addEventListener('click',e=>{const b=e.target.closest('[data-filter]');if(!b)return;ui.filter=b.dataset.filter;render()});
-window.FOODHUNT_API={getSpots:()=>copy(spots),getCategories:()=>copy(categories),openSpot:id=>{if(spots.some(s=>s.id===id))openModal('spot',id)}};
+window.FOODHUNT_API={
+ getSpots:()=>copy(spots),
+ getCategories:()=>copy(categories),
+ openSpot:id=>{if(spots.some(s=>s.id===id))openModal('spot',id)},
+ assignDiscoveredToSpot:(place,spotId)=>{
+  if(!place||typeof place.osmId!=='string'||!/^(node|way|relation)\/\d+$/.test(place.osmId))return {assigned:false};
+  const latitude=Number(place.latitude),longitude=Number(place.longitude);
+  if(!Number.isFinite(latitude)||!Number.isFinite(longitude)||Math.abs(latitude)>90||Math.abs(longitude)>180)return {assigned:false};
+  const target=spots.find(s=>s.id===spotId);
+  if(!target||target.latitude!==null&&target.latitude!==undefined&&target.longitude!==null&&target.longitude!==undefined)return {assigned:false};
+  if(spots.some(s=>s.osmId===place.osmId))return {assigned:false};
+  target.latitude=latitude;target.longitude=longitude;
+  target.osmId=place.osmId;
+  target.source='openstreetmap';
+  save();render();return {assigned:true,id:target.id};
+ },
+ addDiscoveredSpot:place=>{
+  if(!place||typeof place.osmId!=='string'||!/^(node|way|relation)\/\d+$/.test(place.osmId))return {added:false};
+  const latitude=Number(place.latitude),longitude=Number(place.longitude);
+  if(!Number.isFinite(latitude)||!Number.isFinite(longitude)||Math.abs(latitude)>90||Math.abs(longitude)>180)return {added:false};
+  const name=String(place.name||'').trim().slice(0,100);
+  if(!name||spots.some(s=>s.osmId===place.osmId))return {added:false};
+  const categoryId=categories.some(c=>c.id===place.category)?place.category:(categories[0]?.id||'street');
+  const id='custom-osm-'+place.osmId.replace('/','-');
+  if(spots.some(s=>s.id===id))return {added:false};
+  spots.unshift({id,name,category:categoryId,score:null,valueScore:null,
+   visited:false,suggested:false,favorite:false,dish:'',note:'',address:'',
+   latitude,longitude,source:'openstreetmap',osmId:place.osmId,products:[],
+   addedAt:new Date().toISOString().slice(0,10)});
+  save();render();return {added:true,id};
+ }
+};
 render();
 })();

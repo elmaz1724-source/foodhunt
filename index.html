@@ -27,6 +27,7 @@
   <link rel="stylesheet" href="v9.css" />
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
   <link rel="stylesheet" href="v10.css" />
+  <link rel="stylesheet" href="v11.css" />
   <script defer src="seed.js"></script>
   <script defer src="app.js"></script>
   <script defer src="theme.js"></script>
@@ -91,7 +92,7 @@
 </section>
 <section class="radar-section" id="radarSection" aria-labelledby="radarHeading">
   <div class="radar-header">
-    <div><div class="overline">NEW / FOODHUNT RADAR</div><h2 id="radarHeading">Hungry? <em>Look around.</em></h2><p>Deine gespeicherten Spots. Deine Ratings. Entdecke, was sich in deiner Nähe lohnt.</p></div>
+    <div><div class="overline">NEW / FOODHUNT RADAR</div><h2 id="radarHeading">Hungry? <em>Look around.</em></h2><p>Deine Lieblingsspots und neue Restaurants in deiner Umgebung – direkt auf der Karte.</p></div>
     <span class="radar-brand-icon" aria-hidden="true">⌖</span>
   </div>
   <div class="radar-controls">
@@ -99,8 +100,9 @@
     <div class="radar-radius"><label for="radarRadius">Umkreis</label><select id="radarRadius"><option value="0.5">500 m</option><option value="1">1 km</option><option value="2" selected>2 km</option><option value="5">5 km</option><option value="10">10 km</option><option value="25">25 km</option></select></div>
     <div class="radar-sort"><label for="radarSort">Sortieren</label><select id="radarSort"><option value="nearby">Nächste zuerst</option><option value="rating">Beste Gesamtwertung</option><option value="value">Beste Preis-Leistung</option></select></div>
     <div class="radar-category"><label for="radarCategory">Kategorie</label><select id="radarCategory"><option value="">Alle Kategorien</option></select></div>
+    <div class="radar-source"><label for="radarSource">Anzeigen</label><select id="radarSource"><option value="all">Alle Food-Spots</option><option value="mine">Meine Liste</option><option value="discover">Neue Spots</option></select></div>
   </div>
-  <p id="radarStatus" class="radar-status" role="status" aria-live="polite">Erlaube deinen Standort, um Spots aus deiner Liste in der Nähe zu finden. Dein Standort wird nicht gespeichert.</p>
+  <p id="radarStatus" class="radar-status" role="status" aria-live="polite">Erlaube deinen Standort, um deine Spots und neue Restaurants aus OpenStreetMap zu entdecken. Für die Suche wird dein Standort an einen Kartendienst übertragen; FOODHUNT speichert ihn nicht dauerhaft.</p>
   <div class="radar-body">
     <div class="radar-map-shell">
       <div id="radarMap" class="radar-map" role="region" aria-label="Karte mit deinen FOODHUNT-Spots"></div>
@@ -109,11 +111,12 @@
     </div>
     <div class="radar-results-panel">
       <div class="radar-results-head"><strong>In deiner Nähe</strong><span id="radarCount">0 Spots</span></div>
-      <div id="radarResults" class="radar-results" aria-live="polite"><div class="radar-zero"><span aria-hidden="true">⌖</span><strong>Hier erscheinen deine Food-Spots</strong><p>Verbinde zuerst die Standorte deiner Restaurants. Du brauchst dafür keine kostenpflichtige API.</p></div></div>
+      <div class="radar-discovery-row"><div id="radarDiscoveryStatus" class="radar-discovery-status" role="status" aria-live="polite">Nach Freigabe deines Standorts suchen wir auch nach neuen Restaurants aus OpenStreetMap.</div><button type="button" id="radarRetry" class="radar-retry" disabled>Erneut suchen ↻</button></div>
+      <div id="radarResults" class="radar-results" aria-live="polite"><div class="radar-zero"><span aria-hidden="true">⌖</span><strong>Hier erscheinen deine Food-Spots</strong><p>Nach deiner Standortfreigabe erscheinen hier sowohl deine zugeordneten Spots als auch neue Restaurants aus OpenStreetMap.</p></div></div>
     </div>
   </div>
   <div class="radar-enrich"><div><strong>Deine Restaurants auf die Karte bringen</strong><p id="radarMissingInfo">Noch keine Restaurants mit verifiziertem Standort.</p></div><button type="button" id="radarAssignSpot">Standort ergänzen ↗</button></div>
-  <p class="radar-privacy"><span aria-hidden="true">⌁</span> Dein GPS-Standort wird nur nach Zustimmung abgefragt und nicht dauerhaft gespeichert. Für die Karte werden Kartenkacheln von OpenStreetMap geladen; manuelle Restaurant-Suchen fragen Nominatim ab. Bestätigte Restaurantkoordinaten bleiben lokal auf deinem Gerät. Öffnungszeiten und öffentliche Ratings sind noch nicht verfügbar.</p>
+  <p class="radar-privacy"><span aria-hidden="true">⌁</span> GPS wird erst nach Zustimmung abgefragt und nicht dauerhaft gespeichert. Für Restaurantentdeckung werden Standortkoordinaten an Overpass/OpenStreetMap übertragen; Kartenkacheln kommen von OpenStreetMap, manuelle Standortsuchen von Nominatim. Deine gespeicherten Spots bleiben lokal. Öffnungszeiten und öffentliche Bewertungen werden noch nicht angeboten.</p>
 </section>
     <section class="categories-section" id="categorySection"><div class="section-header"><div><div class="overline">01 / WHAT ARE YOU CRAVING?</div><h2>Pick your <em>craving.</em></h2></div><button class="plain-link" id="addCategoryButton">＋ Kategorie erstellen</button></div><div id="categoryTiles" class="category-tiles"></div></section>
     <section class="rankings-section" id="rankingSection"><div class="section-header"><div><div class="overline">02 / YOUR PERSONAL HALL OF FAME</div><h2>Die <em>Legenden.</em></h2></div><div class="legend">Deine Lieblingsspots auf einen Blick.</div></div><div class="metric-tabs" id="ratingMetricTabs" role="group" aria-label="Ranking nach Bewertung auswählen"><button type="button" class="metric-tab active" data-metric="score" aria-pressed="true"><span aria-hidden="true">★</span> Gesamt</button><button type="button" class="metric-tab" data-metric="valueScore" aria-pressed="false"><span aria-hidden="true">◈</span> Preis-Leistung</button><button type="button" class="metric-tab" data-metric="products" aria-pressed="false"><span aria-hidden="true">🍔</span> Top-Gerichte</button></div><div id="topRated" class="ranking-grid"></div></section>
