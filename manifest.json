@@ -1,14 +1,14 @@
 {
   "id": "./",
-  "name": "FOODHUNT. – Hamburg Food Guide",
+  "name": "FOODHUNT. – Finde deinen nächsten Bite",
   "short_name": "FOODHUNT",
-  "description": "Dein softer Hamburg Food Guide. Speichere, bewerte und entdecke neue Lieblingsspots.",
+  "description": "Entdecke Restaurants, bewerte Gerichte und finde neue Lieblingsspots in deiner Nähe.",
   "lang": "de-DE",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",
-  "background_color": "#101115",
-  "theme_color": "#101115",
+  "background_color": "#FAF8F5",
+  "theme_color": "#FAF8F5",
   "orientation": "portrait-primary",
   "icons": [
     {

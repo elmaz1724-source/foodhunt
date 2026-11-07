@@ -3,20 +3,20 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
-  <meta name="theme-color" content="#191716" />
+  <meta name="theme-color" content="#FAF8F5" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="default" />
   <meta name="apple-mobile-web-app-title" content="FOODHUNT" />
   <meta name="mobile-web-app-capable" content="yes" />
   <link rel="manifest" href="manifest.json" />
   <link rel="apple-touch-icon" href="icons/apple-touch-icon.png" />
-  <meta name="description" content="Dein persönlicher Hamburg Food Guide – 93 Spots, Rankings und Reviews. Entdecke. Bewerte. Wiederhole." />
-  <title>FOODHUNT. — Dein Hamburg Food Guide</title>
+  <meta name="description" content="FOODHUNT findet deinen nächsten Lieblingsspot: Restaurants entdecken, Gerichte bewerten und Empfehlungen in deiner Umgebung finden." />
+  <title>FOODHUNT. — Finde deinen nächsten Bite</title>
   <link rel="icon" type="image/svg+xml" href="favicon.svg" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet" />
-  <script>try{document.documentElement.dataset.theme=localStorage.getItem("foodhunt-theme-v1")==="light"?"light":"dark"}catch{document.documentElement.dataset.theme="dark"}</script>
+  <script>try{document.documentElement.dataset.theme=localStorage.getItem("foodhunt-theme-v1")==="dark"?"dark":"light"}catch{document.documentElement.dataset.theme="light"}</script>
   <link rel="stylesheet" href="style.css" />
   <link rel="stylesheet" href="v3.css" />
   <link rel="stylesheet" href="v4.css" />
@@ -28,6 +28,7 @@
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
   <link rel="stylesheet" href="v10.css" />
   <link rel="stylesheet" href="v11.css" />
+  <link rel="stylesheet" href="v12.css" />
   <script defer src="seed.js"></script>
   <script defer src="app.js"></script>
   <script defer src="theme.js"></script>
@@ -47,7 +48,7 @@
   <aside class="sidebar">
     <a class="logo" href="#home" aria-label="Foodhunt Startseite">FOOD<span>HUNT.</span><span class="logo-star">✳</span></a>
     <div class="theme-sidebar-row"><button class="theme-toggle" type="button" data-theme-toggle><span class="theme-glyph" aria-hidden="true">☀</span><span class="theme-text">Hell</span></button></div>
-    <div class="side-note">YOUR LITTLE FOOD JOURNAL<br /><span>HAMBURG · EST. 2026</span></div>
+    <div class="side-note">YOUR DAILY FOOD COMPANION<br /><span>ANY CITY · EST. 2026</span></div>
     <div class="side-section-label">DEIN GUIDE</div>
     <nav class="main-nav" aria-label="Hauptnavigation">
       <button class="nav-link selected" data-view="home"><span>▦</span> Übersicht</button>
@@ -66,21 +67,25 @@
   </aside>
   <main id="home" class="content">
     <header class="topbar">
-      <div class="location"><span class="live-dot"></span> HAMBURG <span class="location-muted">/ CURATED BY YOU</span></div>
+      <div class="location"><span class="live-dot"></span> FOODHUNT <span class="location-muted">/ DEIN FOODKOMPASS</span></div>
       <div class="top-actions"><span class="today-date" id="todayDate"></span><button class="add-button" id="addSpotTop"><span>＋</span> Spot hinzufügen</button></div>
     </header>
     <section class="hero" id="hero">
       <div class="hero-copy">
-        <div class="eyebrow"><span class="hero-spark">✳</span> DEIN HAMBURG FOOD GUIDE <span class="hero-edition">VOL. 07</span></div>
-        <h1>Crave it.<br><span>Save it.</span><br>Love it.</h1>
-        <p>Alle Spots, die du ausprobieren willst. Die besten Bites, deine echten Ratings. Alles an einem Ort.</p>
-        <div class="hero-buttons"><button class="button-dark" id="exploreButton">Spots entdecken <span>↗</span></button><button class="button-text" id="surpriseButton">Überrasch mich ↗</button></div>
-        <div class="hero-scribble">MADE FOR YOUR NEXT BITE <span aria-hidden="true">✳</span></div>
+        <div class="eyebrow"><span class="hero-spark">✳</span> GOOD FOOD, NO GUESSWORK <span class="hero-edition">FOODHUNT</span></div>
+        <h1>Hunger?<br><span>Find was Gutes.</span></h1>
+        <p>Entdecke leckere Food-Spots, finde dein neues Lieblingsgericht und entscheide schneller, wo du essen willst.</p>
+        <div class="hero-buttons"><button class="button-dark" type="button" data-view="nearby"><span aria-hidden="true">⌖</span> In meiner Nähe</button><button class="button-text" id="exploreButton" type="button">Spots entdecken ↗</button><button class="button-text" id="surpriseButton" type="button">Überrasch mich ✳</button></div>
+        <div class="hero-scribble">GOOD FOOD. GREAT MEMORIES. <span aria-hidden="true">✳</span></div>
       </div>
       <div class="hero-photo" role="img" aria-label="Food Fotografie von einem Burger">
-        <div class="hero-fallback" aria-hidden="true">🍔</div><img class="hero-real-photo" src="https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=1100&amp;q=85&amp;fit=crop" alt="" onerror="this.style.display='none'" /><div class="hero-photo-shade"></div><span class="hero-photo-tag"><span class="hero-photo-tag-top">FOODHUNT</span><strong>HH.</strong><span class="hero-photo-tag-bottom">EAT LOCAL ↗</span></span><span class="hero-photo-label">CURATED WITH APPETITE ✳</span>
+        <div class="hero-fallback" aria-hidden="true">🍔</div><img class="hero-real-photo" src="https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=1100&amp;q=85&amp;fit=crop" alt="" onerror="this.style.display='none'" /><div class="hero-photo-shade"></div><span class="hero-photo-tag"><span class="hero-photo-tag-top">FOODHUNT</span><strong>FH.</strong><span class="hero-photo-tag-bottom">EAT LOCAL ↗</span></span><span class="hero-photo-label">CURATED WITH APPETITE ✳</span>
       </div>
     </section>
+    <div class="soft-discover-strip" aria-label="FOODHUNT auf einen Blick">
+      <span class="soft-strip-note"><span aria-hidden="true">✦</span> Dein Geschmack, deine Entdeckungen.</span>
+      <button type="button" data-view="nearby" class="soft-strip-link">Restaurants in deiner Nähe finden <span aria-hidden="true">↗</span></button>
+    </div>
     <section class="stat-grid" aria-label="Deine Statistik">
       <div class="stat-card"><div class="stat-top">GESAMTE SPOTS <span>↗</span></div><div class="stat-value" id="spotCount">93</div><div class="stat-bottom">Deine Food Bucket List</div></div>
       <div class="stat-card"><div class="stat-top">BEREITS GETESTET <span>◉</span></div><div class="stat-value" id="visitedCount">4<span class="stat-unit"> / 93</span></div><div class="stat-bottom" id="progressLabel">4,3% deiner Liste</div><div class="stat-progress"><span id="progressBar"></span></div></div>
@@ -125,7 +130,7 @@
       <div class="filter-row" id="quickFilters"><button class="filter-pill active" data-filter="all">Alle Spots</button><button class="filter-pill" data-filter="unvisited">Noch offen</button><button class="filter-pill" data-filter="visited">Getestet ✓</button><button class="filter-pill" data-filter="suggested">Neue Vorschläge ✳</button><button class="filter-pill" data-filter="favorite">Favoriten <svg class="heart-svg" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78Z"/></svg></button></div>
       <div class="result-count"><span id="resultsLabel">93 SPOTS ENTDECKEN</span><span id="categoryFilterName">ALLE KATEGORIEN</span></div><div class="spot-grid" id="spotGrid"></div><div class="empty-state hidden" id="emptyState"><span>🍽️</span><strong>Hier ist noch Platz für guten Geschmack.</strong><p>Kein Spot gefunden. Ändere die Filter oder füge einen neuen hinzu.</p><button id="emptyAdd">＋ Spot hinzufügen</button></div>
     </section>
-    <footer>FOOD<span>HUNT.</span><span>HAMBURG FOOD ARCHIVE · BUILT FOR THE NEXT BITE · 2026</span><span>MADE WITH APPETITE ✳</span></footer>
+    <footer>FOOD<span>HUNT.</span><span>FOOD DISCOVERY · BUILT FOR THE NEXT BITE · 2026</span><span>MADE WITH APPETITE ✳</span></footer>
   </main>
 </div>
 <nav class="mobile-bottom-nav" aria-label="Mobile Navigation"><button class="mobile-nav-link selected" data-view="home" type="button"><span class="mobile-nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="m3 10 9-7 9 7v10a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1Z"/></svg></span>Home</button><button class="mobile-nav-link" data-view="discover" type="button"><span class="mobile-nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m16 16 5 5"/></svg></span>Entdecken</button><button class="mobile-nav-link" data-view="nearby" type="button"><span class="mobile-nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="2"/><path d="M12 3v3m0 12v3M3 12h3m12 0h3"/><circle cx="12" cy="12" r="8"/></svg></span>Radar</button><button class="mobile-nav-link" data-view="rankings" type="button"><span class="mobile-nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="m12 2 3.2 6.5 7.2 1-5.2 5 .95 7.1L12 18.2 5.85 21.6l.95-7.1-5.2-5 7.2-1Z"/></svg></span>Rankings</button><button class="mobile-nav-link" data-view="visited" type="button"><span class="mobile-nav-icon heart-nav-icon" aria-hidden="true"><svg class="heart-svg" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78Z"/></svg></span>Getestet</button></nav>

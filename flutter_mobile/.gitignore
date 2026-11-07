@@ -1,0 +1,13 @@
+# Generated Flutter and platform files
+.dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
+.packages
+build/
+coverage/
+.idea/
+*.iml
+# iOS signing and private settings must not be committed.
+**/*.mobileprovision
+**/*.p12
+**/*.key
