@@ -1,0 +1,122 @@
+/* FOODHUNT V14 — touch, accessibility and input polish
+   Applied selectively with mobile-native, emil-design-eng and break-ui.
+   Keep the V13 warm, soft visual language and all existing app features. */
+html { -webkit-tap-highlight-color: transparent; }
+button, .nav-link, .mobile-nav-link, .filter-pill, .metric-tab, summary {
+  touch-action: manipulation;
+  -webkit-user-select: none;
+  user-select: none;
+}
+:where(button, a, input, select, textarea, summary):focus-visible {
+  outline: 3px solid var(--accent-strong);
+  outline-offset: 3px;
+}
+#modalTitle:focus { outline: none; }
+.search-field input[type="search"] {
+  appearance: none;
+  -webkit-appearance: none;
+  min-width: 0;
+}
+.search-field input[type="search"]::-webkit-search-cancel-button{
+  cursor: pointer;
+}
+.spot-card h3,.rank-name,.best-item-name,.product-entry-info>strong,
+.radar-result-body>strong,.next-pick-info>strong{
+  overflow-wrap: anywhere;
+  word-break: normal;
+  min-width: 0;
+}
+.spot-card-main,.product-entry-info,.next-pick-info,.radar-result-body,
+.ranking-card { min-width: 0; }
+.modal,.modal-form,.radar-results { overscroll-behavior-y: contain; }
+.mobile-nav-link,.filter-pill,.metric-tab,.favorite-heart,
+.radar-locate,.product-save,.save-button,.add-button,.mobile-add,
+.product-add,.radar-result-actions button,.radar-result-actions a {
+  transition: transform 140ms cubic-bezier(.23,1,.32,1),
+              background-color 160ms cubic-bezier(.23,1,.32,1),
+              border-color 160ms cubic-bezier(.23,1,.32,1),
+              color 160ms cubic-bezier(.23,1,.32,1);
+}
+:where(.favorite-heart,.filter-pill,.metric-tab,.radar-locate,
+.product-save,.save-button,.add-button,.mobile-add,.product-add,
+.radar-result-actions button,.radar-result-actions a):active {
+  transform: scale(.97);
+}
+/* Touch screens should not retain hover lifts or color changes after taps. */
+@media (hover: none) {
+  .cat-tile:hover,.spot-card:hover,.ranking-card:hover {
+    transform: none !important;
+    box-shadow: none !important;
+  }
+  .cat-tile:hover,.spot-card:hover,.ranking-card:hover,
+  .cat-tile:hover:not(.active) {
+    border-color: var(--v3-border) !important;
+  }
+  .cat-tile.active,.cat-tile.active:hover {border-color:var(--accent) !important;}
+  .ranking-card:first-child,.ranking-card:first-child:hover {
+    border-color: var(--accent) !important;
+  }
+  .hero .button-dark:hover {
+    background: #f9f6ef;
+    box-shadow: none;
+  }
+  .hero .button-text:hover {background:rgba(32,30,29,.38);}
+  .sidebar .nav-link:hover,.sidebar .side-cat:hover {
+    background: transparent;
+  }
+  .sidebar .nav-link.selected,.sidebar .nav-link.selected:hover {
+    background: var(--surface-2);
+  }
+}
+/* iOS zooms the page when an editable input/select uses a font under 16px.
+   Preserve the deliberately large rating-number display and range sliders. */
+@media (pointer: coarse) {
+  input:not([type="hidden"]):not([type="checkbox"]):not([type="radio"]):not([type="range"]):not(.rating-number),
+  select, textarea {
+    font-size: 16px !important;
+  }
+  .search-field input[type="search"]{min-height:44px;}
+  .radar-controls select,.browse-controls select,
+  .review-field input:not([type="hidden"]),.review-field select,
+  .review-field textarea {
+    min-height: 44px;
+  }
+  .mobile-nav-link {
+    min-height: 52px;
+    font-size: 11px;
+  }
+  .favorite-heart {
+    min-width: 44px;
+    min-height: 44px;
+  }
+  .product-entry-actions button {
+    width: 40px;
+    height: 40px;
+  }
+  .radar-result-actions button,.radar-result-actions a {
+    min-height: 44px;
+  }
+  .mobile-bottom-nav {
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+    background: var(--surface);
+  }
+}
+@media (max-width:390px) and (pointer:coarse) {
+  .mobile-nav-link { font-size: 10px; padding-inline:1px; }
+  .product-entry-actions { gap:2px; }
+  .product-entry {gap:8px;}
+  .product-entry-score {flex-basis:52px;}
+}
+@media (prefers-reduced-motion:reduce) {
+  html{scroll-behavior:auto;}
+  .mobile-nav-link,.filter-pill,.metric-tab,.favorite-heart,
+  .radar-locate,.product-save,.save-button,.add-button,.mobile-add,
+  .product-add,.radar-result-actions button,.radar-result-actions a,
+  .cat-tile,.spot-card,.ranking-card {
+    transition:none !important;
+  }
+  :where(button,.cat-tile,.spot-card,.ranking-card):active {
+    transform:none !important;
+  }
+}
