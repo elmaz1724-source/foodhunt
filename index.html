@@ -25,13 +25,14 @@
   <link rel="stylesheet" href="v7.css" />
   <link rel="stylesheet" href="v8.css" />
   <link rel="stylesheet" href="v9.css" />
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+  <link rel="stylesheet" id="leafletStylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="anonymous" />
   <link rel="stylesheet" href="v10.css" />
   <link rel="stylesheet" href="v11.css" />
   <link rel="stylesheet" href="v12.css" />
   <link rel="stylesheet" href="v13.css" />
   <link rel="stylesheet" href="v14.css" />
   <link rel="stylesheet" href="v15.css" />
+  <link rel="stylesheet" href="v16.css" />
   <script defer src="seed.js"></script>
   <script defer src="app.js"></script>
   <script defer src="theme.js"></script>
@@ -108,15 +109,17 @@
   <div class="radar-controls">
     <button id="radarLocate" class="radar-locate" type="button"><span aria-hidden="true">◎</span> Standort verwenden</button>
     <div class="radar-radius"><label for="radarRadius">Umkreis</label><select id="radarRadius"><option value="0.5">500 m</option><option value="1">1 km</option><option value="2" selected>2 km</option><option value="5">5 km</option><option value="10">10 km</option><option value="25">25 km</option></select></div>
-    <div class="radar-sort"><label for="radarSort">Sortieren</label><select id="radarSort"><option value="nearby">Nächste zuerst</option><option value="rating">Beste Gesamtwertung</option><option value="value">Beste Preis-Leistung</option></select></div>
+    <div class="radar-sort"><label for="radarSort">Sortieren</label><select id="radarSort"><option value="nearby">Nächste zuerst</option><option value="rating">Meine Bewertung</option><option value="value">Meine Preis-Leistung</option></select></div>
     <div class="radar-category"><label for="radarCategory">Kategorie</label><select id="radarCategory"><option value="">Alle Kategorien</option></select></div>
     <div class="radar-source"><label for="radarSource">Anzeigen</label><select id="radarSource"><option value="all">Alle Food-Spots</option><option value="mine">Meine Liste</option><option value="discover">Neue Spots</option></select></div>
   </div>
+  <form id="radarPlaceForm" class="radar-place-form" autocomplete="off"><label for="radarPlaceInput">Oder suche ohne GPS</label><div class="radar-place-row"><input id="radarPlaceInput" name="place" type="search" maxlength="120" placeholder="Stadt, Ort oder Postleitzahl" aria-label="Stadt oder Ort suchen" /><button id="radarPlaceSearch" type="submit">Ort suchen</button></div></form>
   <p id="radarStatus" class="radar-status" role="status" aria-live="polite">Erlaube deinen Standort, um deine Spots und neue Restaurants aus OpenStreetMap zu entdecken. Für die Suche wird dein Standort an einen Kartendienst übertragen; FOODHUNT speichert ihn nicht dauerhaft.</p>
   <div class="radar-body">
     <div class="radar-map-shell">
       <div id="radarMap" class="radar-map" role="region" aria-label="Karte mit deinen FOODHUNT-Spots"></div>
       <div id="radarMapCover" class="radar-map-cover"><svg class="radar-empty-icon" viewBox="0 0 24 24" width="48" height="48" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m3 6 6-3 6 3 6-3v15l-6 3-6-3-6 3V6z"/><path d="M9 3v15M15 6v15"/></svg><strong>Dein Food-Radar</strong><p>Die Karte startet, sobald du deinen Standort freigibst.</p></div>
+      <div id="radarMapWarning" class="radar-map-warning hidden" role="status" aria-live="polite">Kartenkacheln können nicht geladen werden. <a id="radarExternalMap" href="https://www.openstreetmap.org/" target="_blank" rel="noopener noreferrer">Karte extern öffnen</a></div>
       <div class="radar-map-caption">Kartendaten © OpenStreetMap-Mitwirkende · <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer">Lizenz</a></div>
     </div>
     <div class="radar-results-panel">
@@ -126,7 +129,7 @@
     </div>
   </div>
   <div class="radar-enrich"><div><strong>Deine Restaurants auf die Karte bringen</strong><p id="radarMissingInfo">Noch keine Restaurants mit verifiziertem Standort.</p></div><button type="button" id="radarAssignSpot">Standort ergänzen ↗</button></div>
-  <p class="radar-privacy"><span aria-hidden="true">⌁</span> GPS wird erst nach Zustimmung abgefragt und nicht dauerhaft gespeichert. Für Restaurantentdeckung werden Standortkoordinaten an Overpass/OpenStreetMap übertragen; Kartenkacheln kommen von OpenStreetMap, manuelle Standortsuchen von Nominatim. Deine gespeicherten Spots bleiben lokal. Öffnungszeiten und öffentliche Bewertungen werden noch nicht angeboten.</p>
+  <p class="radar-privacy"><span aria-hidden="true">⌁</span> GPS wird nur nach Zustimmung abgefragt und nicht dauerhaft gespeichert. Auch bei einer Ortssuche werden die ausgewählten Koordinaten für die Restaurantentdeckung an öffentliche Overpass-Dienste übertragen. Die Ortssuche nutzt Nominatim, Kartenkacheln OpenStreetMap. Deine Bewertungen bleiben lokal. Öffnungszeiten und öffentliche Bewertungen werden nicht angezeigt.</p>
 </section>
     <section class="categories-section" id="categorySection"><div class="section-header"><div><div class="overline">Nach Küche entdecken</div><h2>Worauf hast du Hunger?</h2></div><button class="plain-link" id="addCategoryButton">＋ Kategorie erstellen</button></div><div id="categoryTiles" class="category-tiles"></div></section>
     <section class="rankings-section" id="rankingSection"><div class="section-header"><div><div class="overline">Deine Bewertungen</div><h2>Deine besten Food-Spots</h2></div><div class="legend">Deine Lieblingsspots auf einen Blick.</div></div><div class="metric-tabs" id="ratingMetricTabs" role="group" aria-label="Ranking nach Bewertung auswählen"><button type="button" class="metric-tab active" data-metric="score" aria-pressed="true"><span aria-hidden="true">★</span> Gesamt</button><button type="button" class="metric-tab" data-metric="valueScore" aria-pressed="false"><span aria-hidden="true">◈</span> Preis-Leistung</button><button type="button" class="metric-tab" data-metric="products" aria-pressed="false"><span aria-hidden="true">🍔</span> Top-Gerichte</button></div><div id="topRated" class="ranking-grid"></div></section>

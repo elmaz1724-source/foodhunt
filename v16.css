@@ -1,0 +1,104 @@
+/* FOODHUNT V16 — Radar reliability and manual place lookup.
+   Map, list and location errors remain usable on mobile. */
+.radar-place-form{
+  display:flex;
+  flex-direction:column;
+  gap:7px;
+  margin:6px 0 13px;
+}
+.radar-place-form>label{
+  color:var(--muted);
+  font:600 12px/1.4 'DM Sans',system-ui,sans-serif;
+}
+.radar-place-row{
+  display:flex;
+  gap:9px;
+  align-items:stretch;
+}
+.radar-place-row input{
+  flex:1 1 240px;
+  min-width:0;
+  min-height:46px;
+  padding:11px 14px;
+  border:1px solid var(--v3-border);
+  border-radius:13px;
+  background:var(--surface);
+  color:var(--ink);
+  font:500 15px/1.35 'DM Sans',system-ui,sans-serif;
+}
+.radar-place-row input::placeholder{
+  color:var(--muted);
+  opacity:1;
+}
+.radar-place-row input:focus-visible{
+  outline:2px solid var(--accent-strong);
+  outline-offset:2px;
+}
+.radar-place-row button{
+  flex:0 0 auto;
+  min-height:46px;
+  padding:11px 18px;
+  border:1px solid var(--v3-border);
+  border-radius:13px;
+  background:var(--surface-2);
+  color:var(--ink);
+  font:600 12px/1.25 'DM Sans',system-ui,sans-serif;
+  cursor:pointer;
+}
+.radar-place-row button:disabled{
+  opacity:.58;
+  cursor:wait;
+}
+.radar-place-row button:active{transform:scale(.98)}
+.radar-map-warning{
+  position:absolute;
+  z-index:800;
+  bottom:30px;
+  left:10px;
+  right:10px;
+  padding:12px 14px;
+  border:1px solid rgba(245,192,153,.42);
+  border-radius:13px;
+  background:#302a26;
+  color:#fff4eb;
+  font:500 12px/1.5 'DM Sans',system-ui,sans-serif;
+  box-shadow:0 6px 20px rgba(0,0,0,.12);
+}
+.radar-map-warning a,
+.radar-map-cover a{
+  color:#ffccab;
+  text-decoration:underline;
+  text-underline-offset:2px;
+  font-weight:600;
+}
+.radar-map-warning.hidden{display:none!important}
+.radar-map-cover strong{font-size:19px}
+.radar-map-cover p{max-width:295px}
+.radar-result[data-radar-id]{scroll-margin-top:10px}
+.radar-discovery-status[data-mode="warning"]{color:var(--accent-strong)}
+.radar-map-cover a:focus-visible,.radar-map-warning a:focus-visible{
+  outline:3px solid #fff;
+  outline-offset:3px;
+}
+@media(max-width:720px){
+  .radar-place-form{margin-top:5px;margin-bottom:12px}
+  .radar-place-row input{
+    min-height:48px;
+    font-size:16px;
+    padding:11px 12px;
+  }
+  .radar-place-row button{min-height:48px;padding:10px 12px;font-size:12px}
+  .radar-map-warning{
+    left:7px;right:7px;bottom:27px;
+    padding:10px 11px;
+    font-size:11px;
+  }
+}
+@media(max-width:350px){
+  .radar-place-row{flex-wrap:wrap}
+  .radar-place-row input,.radar-place-row button{flex:1 1 100%}
+}
+@media(prefers-reduced-motion:reduce){
+  .radar-place-row button{transition:none!important}
+  .radar-place-row button:active{transform:none!important}
+}
