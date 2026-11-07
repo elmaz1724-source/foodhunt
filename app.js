@@ -48,7 +48,7 @@ const scoreFor=s=>productStats(s).average??s.score??null;
 
 const save=()=>{try{localStorage.setItem(SPOT_KEY,JSON.stringify(spots));localStorage.setItem(CAT_KEY,JSON.stringify(categories))}catch{toast('Speicherplatz voll – bitte Daten exportieren')}document.dispatchEvent(new Event('foodhunt:datachange'))};
 let toastTimer;function toast(message){const el=$('toast');el.textContent=message;el.classList.add('visible');clearTimeout(toastTimer);toastTimer=setTimeout(()=>el.classList.remove('visible'),3000)}
-function renderStats(){const done=spots.filter(s=>s.visited).length,total=spots.length,pct=total?done/total*100:0;$('spotCount').textContent=total;$('visitedCount').innerHTML=`${done}<span class="stat-unit"> / ${total}</span>`;$('progressLabel').textContent=`${fmt(pct)}% deiner Liste`;$('progressBar').style.width=pct+'%';$('categoryCount').textContent=categories.length}
+function renderStats(){const done=spots.filter(s=>s.visited).length,total=spots.length,pct=total?done/total*100:0;$('spotCount').textContent=total;$('visitedCount').innerHTML=`${done}<span class="stat-unit"> / ${total}</span>`;$('progressLabel').textContent=`${fmt(pct)}% deiner Liste`;$('progressBar').style.width=pct+'%';$('categoryCount').textContent=categories.length;const profileSpots=$('profileSpotsCount'),profileVisited=$('profileVisitedCount'),profileFavorites=$('profileFavoriteCount');if(profileSpots)profileSpots.textContent=total;if(profileVisited)profileVisited.textContent=done;if(profileFavorites)profileFavorites.textContent=spots.filter(s=>s.favorite).length}
 function renderSideCategories(){let html='';for(const c of categories){let count=spots.filter(s=>s.category===c.id).length;html+=`<button type="button" class="side-cat ${ui.category===c.id?'active':''}" data-category="${escapeHTML(c.id)}"><span>${escapeHTML(c.name)}</span><strong>${count}</strong></button>`}$('sidebarCategories').innerHTML=html}
 function renderCategories(){
  $('categoryTiles').innerHTML=categories.map((c,i)=>{
@@ -108,10 +108,50 @@ function renderSpots(){
   return `<article class="spot-card cat-tone-${tint} ${s.favorite?'is-favorite':''}"><div class="spot-cover"><span class="spot-cover-orbit" aria-hidden="true"></span><span class="spot-cover-emoji" aria-hidden="true">${escapeHTML(c.emoji)}</span>${badge}<button class="favorite-heart ${s.favorite?'active':''}" type="button" data-favorite="${escapeHTML(s.id)}" aria-pressed="${s.favorite?'true':'false'}" aria-label="${escapeHTML(s.name)} ${s.favorite?'aus Favoriten entfernen':'als Favorit speichern'}" title="${s.favorite?'Aus Favoriten entfernen':'Zu Favoriten hinzufügen'}"><svg class="heart-svg" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78Z"/></svg></button></div><button class="spot-card-main" type="button" data-spot="${escapeHTML(s.id)}"><span class="spot-category"><span class="category-dot"></span> ${escapeHTML(c.name)}</span><h3>${escapeHTML(s.name)}</h3>${product.best?`<div class="spot-best-item"><span class="best-item-label">Bester Bite</span><span class="best-item-name">${escapeHTML(product.best.name)}</span><strong>★ ${fmt(product.best.score)}</strong></div><span class="spot-product-count">${product.total} Gericht${product.total===1?'':'e'} getestet</span>`:'' }<div class="spot-footer">${scores}<span class="spot-enter" aria-hidden="true">↗</span></div></button><a class="spot-map-link" href="${escapeHTML(mapsUrl(s))}" target="_blank" rel="noopener noreferrer" aria-label="${escapeHTML(s.name)} – ${escapeHTML(mapLabel)}"><span class="spot-map-icon" aria-hidden="true">⌖</span>${escapeHTML(mapLabel)}<span aria-hidden="true">↗</span></a></article>`;
  }).join('');
 }
-function render(){renderStats();renderSideCategories();renderCategories();renderRankings();renderSpots();document.querySelectorAll('.filter-pill').forEach(b=>b.classList.toggle('active',b.dataset.filter===ui.filter));document.querySelectorAll('.nav-link').forEach(b=>b.classList.toggle('selected',b.dataset.view===ui.view))}
+function render(){
+ renderStats();renderSideCategories();renderCategories();renderRankings();renderSpots();
+ document.querySelectorAll('.filter-pill').forEach(b=>b.classList.toggle('active',b.dataset.filter===ui.filter));
+ document.querySelectorAll('.nav-link[data-view]').forEach(b=>{
+  const active=b.dataset.view===ui.view;b.classList.toggle('selected',active);
+  if(active)b.setAttribute('aria-current','page');else b.removeAttribute('aria-current');
+ });
+ const mobileView=['rankings','visited','favorites'].includes(ui.view)?'profile':ui.view;
+ document.querySelectorAll('.mobile-nav-link[data-view]').forEach(b=>{
+  const active=b.dataset.view===mobileView;b.classList.toggle('selected',active);
+  if(active)b.setAttribute('aria-current','page');else b.removeAttribute('aria-current');
+ });
+}
 function scrollToId(id){$(id)?.scrollIntoView({behavior:'smooth',block:'start'})}
-function setCategory(id){ui.category=ui.category===id?null:id;ui.view='discover';ui.filter='all';render();scrollToId('browseSection')}
-function setView(view){ui.view=view;if(view==='home'){ui.category=null;ui.filter='all';render();scrollToId('home')}else if(view==='discover'){ui.category=null;ui.filter='all';render();scrollToId('browseSection')}else if(view==='nearby'){render();scrollToId('radarSection');document.dispatchEvent(new Event('foodhunt:radar-open'))}else if(view==='rankings'){render();scrollToId('rankingSection')}else if(view==='visited'){ui.category=null;ui.filter='visited';render();scrollToId('browseSection')}}
+function setCategory(id){const next=ui.category===id?null:id;if(ui.view!=='discover'){try{history.pushState({...history.state,foodhuntView:'discover'},'',location.href)}catch{}}ui.category=next;ui.view='discover';ui.filter='all';render();scrollToId('browseSection')}
+const NAV_VIEWS=new Set(['home','discover','nearby','rankings','visited','favorites','profile']);
+function setView(view,{fromHistory=false}={}){
+ if(!NAV_VIEWS.has(view))return;
+ if(!fromHistory&&ui.view!==view){
+  try{history.pushState({...history.state,foodhuntView:view},'',location.href)}catch{}
+ }
+ ui.view=view;
+ if(view==='home'){
+  ui.category=null;ui.filter='all';render();scrollToId('home');
+ }else if(view==='discover'){
+  ui.category=null;ui.filter='all';render();scrollToId('browseSection');
+ }else if(view==='nearby'){
+  render();scrollToId('radarSection');document.dispatchEvent(new Event('foodhunt:radar-open'));
+ }else if(view==='rankings'){
+  render();scrollToId('rankingSection');
+ }else if(view==='visited'||view==='favorites'){
+  ui.category=null;ui.filter=view==='visited'?'visited':'favorite';render();scrollToId('browseSection');
+ }else if(view==='profile'){
+  render();scrollToId('profileSection');
+ }
+}
+try{
+ if(!history.state?.foodhuntView)history.replaceState({...history.state,foodhuntView:'home'},'',location.href);
+ history.scrollRestoration='manual';
+}catch{}
+window.addEventListener('popstate',e=>{
+ const view=NAV_VIEWS.has(e.state?.foodhuntView)?e.state.foodhuntView:'home';
+ setView(view,{fromHistory:true});
+});
 function openModal(type='spot',id=null){$('modalBackdrop').classList.remove('hidden');document.body.style.overflow='hidden';$('spotForm').classList.toggle('hidden',type!=='spot');$('categoryForm').classList.toggle('hidden',type!=='category');$('backupPanel').classList.toggle('hidden',type!=='backup');$('modalTitle').textContent=type==='spot'?(id?'Spot bearbeiten':'Spot hinzufügen'):type==='category'?'Neue Food-Kategorie':'Daten sichern & laden';
  if(type==='spot'){
   $('spotCategory').innerHTML=categories.map(c=>`<option value="${escapeHTML(c.id)}">${escapeHTML(c.emoji)} ${escapeHTML(c.name)}</option>`).join('');
@@ -186,8 +226,8 @@ function backup(){const out={app:'FOODHUNT',version:1,exportedAt:new Date().toIS
 async function importBackup(e){const file=e.target.files?.[0];if(!file)return;try{if(file.size>5e6)throw Error('Datei ist zu groß');const raw=JSON.parse(await file.text());if(raw.app!=='FOODHUNT'||!Array.isArray(raw.categories)||!Array.isArray(raw.spots)||raw.spots.length>10000||raw.categories.length>1000)throw Error('Das ist keine gültige FOODHUNT-Datei');if(!raw.categories.every(c=>typeof c.id==='string'&&typeof c.name==='string'&&typeof c.emoji==='string')||!raw.spots.every(s=>typeof s.id==='string'&&typeof s.name==='string'&&typeof s.category==='string'))throw Error('Ungültige Datensätze');if(!window.confirm('Bestehende Food-Spot-Daten durch dieses Backup ersetzen?'))return;categories=raw.categories;spots=raw.spots;ui.category=null;ui.filter='all';ui.search='';$('searchInput').value='';save();render();closeModal();toast('Backup erfolgreich geladen ✓')}catch(err){toast(err.message||'Backup konnte nicht geladen werden')}finally{e.target.value=''}}
 function surprise(){const pool=spots.filter(s=>!s.visited&&(ui.category?ui.category===s.category:true));if(!pool.length){toast('Keine offenen Spots in dieser Kategorie');return}const chosen=pool[Math.floor(Math.random()*pool.length)];openModal('spot',chosen.id);toast('Dein nächster Food-Spot: '+chosen.name+' ✳')}
 $('todayDate').textContent=new Intl.DateTimeFormat('de-DE',{day:'2-digit',month:'short',year:'numeric'}).format(new Date()).toUpperCase();
-document.addEventListener('click',e=>{const favorite=e.target.closest('[data-favorite]');if(favorite){toggleFavorite(favorite.dataset.favorite,favorite);return}const nav=e.target.closest('[data-view]');if(nav){setView(nav.dataset.view);return}const cat=e.target.closest('[data-category]');if(cat){setCategory(cat.dataset.category);return}const spot=e.target.closest('[data-spot]');if(spot){openModal('spot',spot.dataset.spot);return}});
-$('addSpotTop').onclick=() =>openModal('spot');$('addSpotSection').onclick=()=>openModal('spot');$('emptyAdd').onclick=()=>openModal('spot');$('addCategoryButton').onclick=()=>openModal('category');$('quickCategory').onclick=()=>openModal('category');$('backupButton').onclick=()=>openModal('backup');$('exploreButton').onclick=()=>setView('discover');$('surpriseButton').onclick=surprise;$('closeModal').onclick=closeModal;$('modalBackdrop').addEventListener('click',e=>{if(e.target===$('modalBackdrop'))closeModal()});document.addEventListener('keydown',e=>{if(e.key==='Escape')closeModal()});$('spotName').addEventListener('input',syncMapsLinks);$('spotAddress').addEventListener('input',syncMapsLinks);$('ratingMetricTabs').addEventListener('click',e=>{const button=e.target.closest('[data-metric]');if(!button)return;ui.ratingMetric=['score','valueScore','products'].includes(button.dataset.metric)?button.dataset.metric:'score';renderRankings()});$('spotForm').addEventListener('submit',saveSpot);$('categoryForm').addEventListener('submit',addCategory);$('deleteSpot').onclick=removeSpot;$('exportData').onclick=backup;$('importData').addEventListener('change',importBackup);$('searchInput').addEventListener('input',e=>{ui.search=e.target.value;renderSpots()});$('sortSelect').addEventListener('change',e=>{ui.sort=e.target.value;renderSpots()});$('quickFilters').addEventListener('click',e=>{const b=e.target.closest('[data-filter]');if(!b)return;ui.filter=b.dataset.filter;render()});
+document.addEventListener('click',e=>{const favorite=e.target.closest('[data-favorite]');if(favorite){toggleFavorite(favorite.dataset.favorite,favorite);return}const nav=e.target.closest('[data-view]');if(nav){if(nav.tagName==='A')e.preventDefault();setView(nav.dataset.view);return}const cat=e.target.closest('[data-category]');if(cat){setCategory(cat.dataset.category);return}const spot=e.target.closest('[data-spot]');if(spot){openModal('spot',spot.dataset.spot);return}});
+$('addSpotTop').onclick=() =>openModal('spot');$('mobileCreateSpot').onclick=()=>openModal('spot');$('profileBackup').onclick=()=>openModal('backup');$('addSpotSection').onclick=()=>openModal('spot');$('emptyAdd').onclick=()=>openModal('spot');$('addCategoryButton').onclick=()=>openModal('category');$('quickCategory').onclick=()=>openModal('category');$('backupButton').onclick=()=>openModal('backup');$('exploreButton').onclick=()=>setView('discover');$('surpriseButton').onclick=surprise;$('closeModal').onclick=closeModal;$('modalBackdrop').addEventListener('click',e=>{if(e.target===$('modalBackdrop'))closeModal()});document.addEventListener('keydown',e=>{if(e.key==='Escape')closeModal()});$('spotName').addEventListener('input',syncMapsLinks);$('spotAddress').addEventListener('input',syncMapsLinks);$('ratingMetricTabs').addEventListener('click',e=>{const button=e.target.closest('[data-metric]');if(!button)return;ui.ratingMetric=['score','valueScore','products'].includes(button.dataset.metric)?button.dataset.metric:'score';renderRankings()});$('spotForm').addEventListener('submit',saveSpot);$('categoryForm').addEventListener('submit',addCategory);$('deleteSpot').onclick=removeSpot;$('exportData').onclick=backup;$('importData').addEventListener('change',importBackup);$('searchInput').addEventListener('input',e=>{ui.search=e.target.value;renderSpots()});$('sortSelect').addEventListener('change',e=>{ui.sort=e.target.value;renderSpots()});$('quickFilters').addEventListener('click',e=>{const b=e.target.closest('[data-filter]');if(!b)return;ui.filter=b.dataset.filter;render()});
 window.FOODHUNT_API={
  getSpots:()=>copy(spots),
  getCategories:()=>copy(categories),
@@ -220,5 +260,7 @@ window.FOODHUNT_API={
   save();render();return {added:true,id};
  }
 };
-render();
+let initialView='home';
+try{if(NAV_VIEWS.has(history.state?.foodhuntView))initialView=history.state.foodhuntView}catch{}
+if(initialView==='home')render();else setView(initialView,{fromHistory:true});
 })();

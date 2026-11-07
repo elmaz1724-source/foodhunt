@@ -97,3 +97,31 @@ are not directly usable as Dart.
 Installing a skill in this repository makes its files available to Codex
 **when Codex runs with this repository as its workspace**. It does not
 permanently train ChatGPT or activate the skills in unrelated projects.
+
+## Familiar mobile navigation — Jakob's Law (V15)
+
+When working on the FOODHUNT navigation, preserve the familiar mobile mental
+model without cloning Instagram, TikTok, YouTube or delivery-service trade dress:
+
+- **Home** leftmost, **Entdecken** second, **Radar** fourth, **Profil** rightmost.
+- A prominent **Eintragen (+)** action sits in the middle, but is **not a tab**.
+  On iOS, tabs should represent navigation; compose/create is an action.
+- Personal **Rankings**, **Getestet**, **Favoriten**, light/dark theme and backup
+  stay accessible from the `profileSection` hub. The 'Profil' area is currently
+  **local only**; it does not imply a live account.
+- Keep 44px+ interactive targets, readable icon labels, accessible `aria-current`
+  and visible keyboard focus. Use `mobile-native`, `emil-design-eng`, and
+  `break-ui` selectively for mobile navigation work.
+- Tab/section changes use `history.pushState`; `popstate` restores the prior
+  section so browser Back/edge gestures work. Do not invent gesture recognition
+  which conflicts with platform back or maps.
+- Do **not** install custom pull-to-refresh handlers unless testing proves native
+  browser behavior unsuitable; Safari/PWA behavior differs by environment.
+- Preserve desktop links and existing views, including Rankings/Getestet,
+  all saved data, manual spot creation, map providers and import/export.
+- Keep the Flutter starter's eventual navigation consistent when building actual
+  native screens. Do not introduce inert or fake saved-data controls.
+
+Reference: Nielsen Norman Group's Jakob's Law explanation, and Apple HIG tab
+bar guidance. The five patterns circulating on social media are not formal
+five rules from Jakob's Law. Details: `docs/FOODHUNT_NAVIGATION_V15.md`.
