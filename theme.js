@@ -8,7 +8,7 @@
   root.dataset.theme=theme;
   root.style.colorScheme=theme;
   const meta=document.querySelector('meta[name="theme-color"]');
-  if(meta)meta.content=theme==='dark'?'#101115':'#f6f2ec';
+  if(meta)meta.content=theme==='dark'?'#171817':'#f8f7f4';
   document.querySelectorAll('[data-theme-toggle]').forEach(button=>{
    const isDark=theme==='dark';
    button.setAttribute('aria-label',isDark?'Helles Design aktivieren':'Dunkles Design aktivieren');

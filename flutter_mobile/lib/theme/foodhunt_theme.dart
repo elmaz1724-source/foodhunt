@@ -5,25 +5,25 @@ import 'package:flutter/material.dart';
 /// Independent of third-party delivery apps. The same semantic tokens can
 /// eventually be shared by a design system for Web, iOS, and Android.
 abstract final class FoodHuntColors {
-  static const canvas = Color(0xFFFAF8F5);
+  static const canvas = Color(0xFFF8F7F4);
   static const paper = Color(0xFFFFFFFF);
-  static const peach = Color(0xFFE78663);
-  static const peachPale = Color(0xFFFFF0E8);
-  static const darkText = Color(0xFF242521);
-  static const mutedText = Color(0xFF797D76);
-  static const border = Color(0xFFEAE6DE);
+  static const peach = Color(0xFFD97752);
+  static const peachPale = Color(0xFFFAEEE8);
+  static const darkText = Color(0xFF242523);
+  static const mutedText = Color(0xFF696D67);
+  static const border = Color(0xFFE8E6E0);
   static const sage = Color(0xFF76A485);
 
-  static const darkCanvas = Color(0xFF17191B);
-  static const darkPaper = Color(0xFF232629);
-  static const darkTextSoft = Color(0xFFF7F4F1);
-  static const darkBorder = Color(0xFF383B3C);
+  static const darkCanvas = Color(0xFF171817);
+  static const darkPaper = Color(0xFF222422);
+  static const darkTextSoft = Color(0xFFF5F4F0);
+  static const darkBorder = Color(0xFF353833);
 }
 
 abstract final class FoodHuntRadii {
-  static const double small = 16;
-  static const double medium = 22;
-  static const double large = 30;
+  static const double small = 12;
+  static const double medium = 20;
+  static const double large = 24;
   static const double pill = 99;
 }
 
@@ -66,7 +66,7 @@ abstract final class FoodHuntTheme {
         backgroundColor: paper,
         elevation: 0,
         indicatorColor: dark ? const Color(0xFF44312B) : FoodHuntColors.peachPale,
-        height: 74,
+        height: 72,
       ),
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
@@ -93,7 +93,7 @@ abstract final class FoodHuntTheme {
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(FoodHuntRadii.pill),
           ),
-          textStyle: const TextStyle(fontWeight: FontWeight.w800),
+          textStyle: const TextStyle(fontWeight: FontWeight.w600),
         ),
       ),
       cardColor: paper,
@@ -102,20 +102,20 @@ abstract final class FoodHuntTheme {
         headlineLarge: TextStyle(
           fontSize: 34,
           height: 1.1,
-          fontWeight: FontWeight.w800,
+          fontWeight: FontWeight.w600,
           letterSpacing: -1.5,
           color: text,
         ),
         headlineSmall: TextStyle(
           fontSize: 24,
           height: 1.12,
-          fontWeight: FontWeight.w800,
+          fontWeight: FontWeight.w600,
           letterSpacing: -.6,
           color: text,
         ),
         titleMedium: TextStyle(
           fontSize: 16,
-          fontWeight: FontWeight.w800,
+          fontWeight: FontWeight.w600,
           color: text,
         ),
         bodyMedium: TextStyle(

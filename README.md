@@ -1,18 +1,20 @@
-# FOODHUNT. – Hamburg Food Guide
+# FOODHUNT. – Food Discovery & persönliche Food-Spots
 
-Als iPhone-Web-App installierbare, responsive Website für persönliche Food-Spots, Bewertungen und neue Food-Kategorien.
+Als iPhone-Web-App installierbare Food-Discovery-Website: Restaurants in der Nähe finden, Gerichte bewerten und persönliche Favoriten wiederentdecken.
 
 ## Enthaltene Funktionen
 
 - 93 Start-Spots in 13 Kategorien; 4 vorgegebene Nutzerbewertungen.
 - Suche, Sortierung und Filter für ungetestete / getestete / vorgeschlagene / favorisierte Spots.
 - Beliebig viele neue Food-Spots und Food-Kategorien hinzufügen.
-- Besuche, 0–10 Punkte, Gerichte, Notizen und Favoriten pro Spot bearbeiten.
+- Mehrere Gerichte und Besuche pro Spot mit eigenen Noten, Datum, Preis und Notiz; bestes Gericht und abgeleitete Gesamtnote.
+- Lebensmittel-Finder/Radar mit freigegebenem GPS, Umkreis, Filtern und öffentlich erfassten OpenStreetMap-Restaurants.
+- Eigene Bewertungen bleiben getrennt von externen, unbewerteten Restaurants.
 - Dynamische Rankings, Kategorien-Zähler und Fortschritt.
 - Browser-Speicherung (`localStorage`) inklusive JSON-Backup und Import zum Gerätewechsel.
 - Installierbar auf dem iPhone-Home-Bildschirm mit eigenem Icon (PWA); Grundfunktionen nach dem ersten Laden offline nutzbar.
 - Mobile Navigation am unteren Bildschirmrand.
-- Ohne Framework, ohne Build, ohne Server und ohne kostenpflichtige API.
+- Die Web-App läuft ohne Framework oder Build; öffentliche OpenStreetMap-Dienste werden kostenfrei für den Prototyp genutzt, sind aber nicht als unbeschränkte Produktionsinfrastruktur geeignet.
 
 ## Lokal testen
 
@@ -69,3 +71,29 @@ Mit jeder neuen Codeversion können weitere Restaurants oder Kategorien zentral 
 - `manifest.json` – PWA-Identität, Theme und Icons
 - `sw.js` – Offline-Cache der App-Dateien
 - `icons/` – Homescreen-Icons (180/192/512 px)
+
+## V13 – Unslop UI-Review
+
+Die UI wurde mit den Prinzipien von **[Unslop](https://github.com/heydamir/unslop)**
+überarbeitet: weniger Deko, eine klare Aktion im Hero, kürzere Beschriftungen,
+ruhigere Farbflächen, einheitliche Icons, konsistente Abstände und saubere
+Fokus-/Reduced-Motion-Zustände. Der bereits gewünschte weiche Food-App-Stil
+bleibt erhalten, genau wie alle vorhandenen Bewertungen.
+
+Die Original-Skilldateien für Codex liegen unter
+[`.agents/skills/unslop/`](.agents/skills/unslop/SKILL.md). Für einen erneuten
+Review kann Codex in diesem Projekt mit `$unslop` aufgerufen werden.
+Die projektspezifische Audit-Liste steht unter
+[`docs/FOODHUNT_UNSLOP_AUDIT.md`](docs/FOODHUNT_UNSLOP_AUDIT.md).
+
+**Credit:** Unslop by Damir Sokolovsky ([@heydamir](https://x.com/heydamir)),
+licensed CC BY 4.0. License included in the vendored skill directory.
+Text references and scripts are included; binary visual reference assets remain
+upstream. The design changes were checked at source level; a real mobile-browser
+visual QA remains necessary.
+
+## Flutter Mobile
+
+`flutter_mobile/` contains an independent Flutter design starter.
+**Not yet** a finished/native release and **not connected** to the web app's
+localStorage or live places data. The web app remains the functional version.

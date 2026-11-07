@@ -109,12 +109,12 @@ class _FoodHuntAppState extends State<FoodHuntApp> {
             fontSize: 23,
             height: 1.1,
             letterSpacing: -1.1,
-            fontWeight: FontWeight.w900,
+            fontWeight: FontWeight.w600,
             color: scheme.onSurface,
           ),
         ),
         const SizedBox(width: 5),
-        Text('✳', style: TextStyle(fontSize: 24, color: scheme.primary)),
+        const SizedBox(width: 2),
         const Spacer(),
         IconButton.filledTonal(
           tooltip: _dark ? 'Helles Design' : 'Dunkles Design',
@@ -133,12 +133,12 @@ class _FoodHuntAppState extends State<FoodHuntApp> {
         color: Theme.of(context).colorScheme.primaryContainer,
       ),
       child: Text(
-        'FLUTTER DESIGN-VORSCHAU · NOCH OHNE LIVE-DATEN',
+        'Flutter-Vorschau · Noch keine Live-Daten',
         style: TextStyle(
           fontSize: 9,
           height: 1.2,
-          letterSpacing: .2,
-          fontWeight: FontWeight.w800,
+          letterSpacing: 0,
+          fontWeight: FontWeight.w600,
           color: Theme.of(context).colorScheme.onPrimaryContainer,
         ),
       ),
@@ -191,7 +191,7 @@ class _FoodHuntAppState extends State<FoodHuntApp> {
               'Alle Küchen',
               style: TextStyle(
                 fontSize: 12,
-                fontWeight: FontWeight.w700,
+                fontWeight: FontWeight.w600,
                 color: theme.colorScheme.primary,
               ),
             ),
@@ -252,8 +252,8 @@ class _FoodHuntAppState extends State<FoodHuntApp> {
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
           colors: dark
-              ? const [Color(0xFF644337), Color(0xFF392D2B)]
-              : const [Color(0xFFFFE5D8), Color(0xFFFFF2DE)],
+              ? const [Color(0xFF30332F), Color(0xFF30332F)]
+              : const [Color(0xFFF1E9E1), Color(0xFFF1E9E1)],
         ),
       ),
       child: Column(
@@ -262,21 +262,21 @@ class _FoodHuntAppState extends State<FoodHuntApp> {
           Text(
             '✦  IN DEINER NÄHE',
             style: TextStyle(
-              color: dark ? const Color(0xFFFFCEAB) : const Color(0xFF9E573E),
+              color: dark ? const Color(0xFFF6BD9D) : const Color(0xFF99502E),
               letterSpacing: .7,
               fontSize: 10,
-              fontWeight: FontWeight.w800,
+              fontWeight: FontWeight.w600,
             ),
           ),
           const SizedBox(height: 15),
           Text(
             'Dein nächster\nLieblingsspot wartet.',
             style: TextStyle(
-              fontWeight: FontWeight.w900,
+              fontWeight: FontWeight.w600,
               fontSize: 26,
               height: 1.14,
               letterSpacing: -.8,
-              color: dark ? const Color(0xFFFFF4EA) : FoodHuntColors.darkText,
+              color: dark ? const Color(0xFFF5F4F0) : FoodHuntColors.darkText,
             ),
           ),
           const SizedBox(height: 9),
@@ -284,7 +284,7 @@ class _FoodHuntAppState extends State<FoodHuntApp> {
             'Restaurants statt endloser Suche.',
             style: TextStyle(
               fontSize: 13,
-              color: dark ? const Color(0xFFEED8C9) : const Color(0xFF6D5C53),
+              color: dark ? const Color(0xFFCACDC5) : const Color(0xFF565A55),
             ),
           ),
           const SizedBox(height: 18),
@@ -321,7 +321,7 @@ class _FoodHuntAppState extends State<FoodHuntApp> {
             Text(
               item.name,
               style: TextStyle(
-                fontWeight: FontWeight.w800,
+                fontWeight: FontWeight.w600,
                 fontSize: 17,
                 color: Theme.of(context).colorScheme.onSurface,
               ),
@@ -423,7 +423,7 @@ class _FoodHuntAppState extends State<FoodHuntApp> {
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   fontSize: 12,
-                  fontWeight: FontWeight.w700,
+                  fontWeight: FontWeight.w600,
                   color: theme.colorScheme.primary,
                 ),
               ),

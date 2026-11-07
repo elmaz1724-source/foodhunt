@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
-  <meta name="theme-color" content="#FAF8F5" />
+  <meta name="theme-color" content="#f8f7f4" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="default" />
   <meta name="apple-mobile-web-app-title" content="FOODHUNT" />
@@ -29,6 +29,7 @@
   <link rel="stylesheet" href="v10.css" />
   <link rel="stylesheet" href="v11.css" />
   <link rel="stylesheet" href="v12.css" />
+  <link rel="stylesheet" href="v13.css" />
   <script defer src="seed.js"></script>
   <script defer src="app.js"></script>
   <script defer src="theme.js"></script>
@@ -48,20 +49,20 @@
   <aside class="sidebar">
     <a class="logo" href="#home" aria-label="Foodhunt Startseite">FOOD<span>HUNT.</span><span class="logo-star">✳</span></a>
     <div class="theme-sidebar-row"><button class="theme-toggle" type="button" data-theme-toggle><span class="theme-glyph" aria-hidden="true">☀</span><span class="theme-text">Hell</span></button></div>
-    <div class="side-note">YOUR DAILY FOOD COMPANION<br /><span>ANY CITY · EST. 2026</span></div>
-    <div class="side-section-label">DEIN GUIDE</div>
+    <div class="side-note">Dein Food-Journal<br /><span>Restaurants, die du wirklich magst</span></div>
+    <div class="side-section-label">Navigation</div>
     <nav class="main-nav" aria-label="Hauptnavigation">
-      <button class="nav-link selected" data-view="home"><span>▦</span> Übersicht</button>
-      <button class="nav-link" data-view="discover"><span>◈</span> Entdecken</button>
-      <button class="nav-link" data-view="nearby"><span>⌖</span> In der Nähe</button>
-      <button class="nav-link" data-view="rankings"><span>★</span> Rankings</button>
-      <button class="nav-link" data-view="visited"><span>✓</span> Getestet</button>
-      <button class="nav-link mobile-backup" id="navBackup" type="button"><span>⇩</span> Backup</button>
+      <button class="nav-link selected" data-view="home"><span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg></span> Übersicht</button>
+      <button class="nav-link" data-view="discover"><span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="m16 16 5 5"/></svg></span> Entdecken</button>
+      <button class="nav-link" data-view="nearby"><span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="2"/><path d="M12 1v3M12 20v3M1 12h3M20 12h3"/></svg></span> In der Nähe</button>
+      <button class="nav-link" data-view="rankings"><span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m12 2 3.1 6.3 7 1-5 4.9 1.2 7-6.3-3.3-6.3 3.3 1.2-7-5-4.9 7-1L12 2z"/></svg></span> Rankings</button>
+      <button class="nav-link" data-view="visited"><span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 7 9.5 17.5 4 12"/></svg></span> Getestet</button>
+      <button class="nav-link mobile-backup" id="navBackup" type="button"><span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12m-5-5 5 5 5-5M4 17v4h16v-4"/></svg></span> Backup</button>
     </nav>
-    <div class="side-section-label side-category-label">KATEGORIEN <button id="quickCategory" title="Kategorie hinzufügen" aria-label="Kategorie hinzufügen">＋</button></div>
+    <div class="side-section-label side-category-label">Kategorien <button id="quickCategory" title="Kategorie hinzufügen" aria-label="Kategorie hinzufügen">＋</button></div>
     <div id="sidebarCategories" class="sidebar-categories"></div>
     <div class="sidebar-bottom">
-      <div class="sidebar-promo"><span class="promo-badge">🍟 FOOD MISSION</span><strong>Little bites.<br>Big memories.</strong><small>Dein persönliches Food-Journal.</small></div>
+      <div class="sidebar-promo"><strong>Was war dein bester Bite?</strong><small>Halte gute Gerichte fest, damit du sie wiederfindest.</small></div>
       <button class="side-backup" id="backupButton">⇩ &nbsp;Daten sichern / laden</button>
     </div>
   </aside>
@@ -72,32 +73,32 @@
     </header>
     <section class="hero" id="hero">
       <div class="hero-copy">
-        <div class="eyebrow"><span class="hero-spark">✳</span> GOOD FOOD, NO GUESSWORK <span class="hero-edition">FOODHUNT</span></div>
+        <div class="eyebrow">Dein Food-Guide</div>
         <h1>Hunger?<br><span>Find was Gutes.</span></h1>
         <p>Entdecke leckere Food-Spots, finde dein neues Lieblingsgericht und entscheide schneller, wo du essen willst.</p>
-        <div class="hero-buttons"><button class="button-dark" type="button" data-view="nearby"><span aria-hidden="true">⌖</span> In meiner Nähe</button><button class="button-text" id="exploreButton" type="button">Spots entdecken ↗</button><button class="button-text" id="surpriseButton" type="button">Überrasch mich ✳</button></div>
+        <div class="hero-buttons"><button class="button-dark" type="button" data-view="nearby">In meiner Nähe <span aria-hidden="true">↗</span></button><button class="button-text" id="exploreButton" type="button">Meine Food-Spots</button></div>
         <div class="hero-scribble">GOOD FOOD. GREAT MEMORIES. <span aria-hidden="true">✳</span></div>
       </div>
       <div class="hero-photo" role="img" aria-label="Food Fotografie von einem Burger">
         <div class="hero-fallback" aria-hidden="true">🍔</div><img class="hero-real-photo" src="https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=1100&amp;q=85&amp;fit=crop" alt="" onerror="this.style.display='none'" /><div class="hero-photo-shade"></div><span class="hero-photo-tag"><span class="hero-photo-tag-top">FOODHUNT</span><strong>FH.</strong><span class="hero-photo-tag-bottom">EAT LOCAL ↗</span></span><span class="hero-photo-label">CURATED WITH APPETITE ✳</span>
       </div>
     </section>
-    <div class="soft-discover-strip" aria-label="FOODHUNT auf einen Blick">
-      <span class="soft-strip-note"><span aria-hidden="true">✦</span> Dein Geschmack, deine Entdeckungen.</span>
-      <button type="button" data-view="nearby" class="soft-strip-link">Restaurants in deiner Nähe finden <span aria-hidden="true">↗</span></button>
+    <div class="soft-discover-strip" aria-label="FOODHUNT Entscheidungshilfe">
+      <span class="soft-strip-note">Noch unschlüssig, was du essen sollst?</span>
+      <button type="button" id="surpriseButton" class="soft-strip-link">Überrasch mich <span aria-hidden="true">↗</span></button>
     </div>
     <section class="stat-grid" aria-label="Deine Statistik">
-      <div class="stat-card"><div class="stat-top">GESAMTE SPOTS <span>↗</span></div><div class="stat-value" id="spotCount">93</div><div class="stat-bottom">Deine Food Bucket List</div></div>
-      <div class="stat-card"><div class="stat-top">BEREITS GETESTET <span>◉</span></div><div class="stat-value" id="visitedCount">4<span class="stat-unit"> / 93</span></div><div class="stat-bottom" id="progressLabel">4,3% deiner Liste</div><div class="stat-progress"><span id="progressBar"></span></div></div>
-      <div class="stat-card"><div class="stat-top">FOOD-KATEGORIEN <span>✳</span></div><div class="stat-value" id="categoryCount">13</div><div class="stat-bottom">Von Burger bis Brunch</div></div>
+      <div class="stat-card"><div class="stat-top">Gespeicherte Spots</div><div class="stat-value" id="spotCount">93</div><div class="stat-bottom">Deine Food Bucket List</div></div>
+      <div class="stat-card"><div class="stat-top">Getestet</div><div class="stat-value" id="visitedCount">4<span class="stat-unit"> / 93</span></div><div class="stat-bottom" id="progressLabel">4,3% deiner Liste</div><div class="stat-progress"><span id="progressBar"></span></div></div>
+      <div class="stat-card"><div class="stat-top">Kategorien</div><div class="stat-value" id="categoryCount">13</div><div class="stat-bottom">Von Burger bis Brunch</div></div>
     </section>
     <section class="next-bite" id="nextBiteSection" aria-labelledby="nextBiteTitle">
-  <div class="next-bite-copy"><span class="next-bite-kicker">✦ PICK OF THE DAY</span><h2 id="nextBiteTitle">Dein nächster <em>Bite.</em></h2><p>Ein Spot aus deiner Liste, den du noch entdecken kannst.</p></div>
+  <div class="next-bite-copy"><span class="next-bite-kicker">Dein Vorschlag</span><h2 id="nextBiteTitle">Dein nächster Bite</h2><p>Ein Spot aus deiner Liste, den du noch entdecken kannst.</p></div>
   <div class="next-bite-card" id="nextBiteCard" aria-live="polite"></div>
 </section>
 <section class="radar-section" id="radarSection" aria-labelledby="radarHeading">
   <div class="radar-header">
-    <div><div class="overline">NEW / FOODHUNT RADAR</div><h2 id="radarHeading">Hungry? <em>Look around.</em></h2><p>Deine Lieblingsspots und neue Restaurants in deiner Umgebung – direkt auf der Karte.</p></div>
+    <div><div class="overline">In deiner Nähe</div><h2 id="radarHeading">Wo gibt’s was Gutes?</h2><p>Deine Lieblingsspots und neue Restaurants in deiner Umgebung – direkt auf der Karte.</p></div>
     <span class="radar-brand-icon" aria-hidden="true">⌖</span>
   </div>
   <div class="radar-controls">
@@ -111,7 +112,7 @@
   <div class="radar-body">
     <div class="radar-map-shell">
       <div id="radarMap" class="radar-map" role="region" aria-label="Karte mit deinen FOODHUNT-Spots"></div>
-      <div id="radarMapCover" class="radar-map-cover"><span aria-hidden="true">🗺️</span><strong>Dein Food-Radar</strong><p>Die Karte startet, sobald du deinen Standort freigibst.</p></div>
+      <div id="radarMapCover" class="radar-map-cover"><svg class="radar-empty-icon" viewBox="0 0 24 24" width="48" height="48" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m3 6 6-3 6 3 6-3v15l-6 3-6-3-6 3V6z"/><path d="M9 3v15M15 6v15"/></svg><strong>Dein Food-Radar</strong><p>Die Karte startet, sobald du deinen Standort freigibst.</p></div>
       <div class="radar-map-caption">Kartendaten © OpenStreetMap-Mitwirkende · <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer">Lizenz</a></div>
     </div>
     <div class="radar-results-panel">
@@ -123,20 +124,20 @@
   <div class="radar-enrich"><div><strong>Deine Restaurants auf die Karte bringen</strong><p id="radarMissingInfo">Noch keine Restaurants mit verifiziertem Standort.</p></div><button type="button" id="radarAssignSpot">Standort ergänzen ↗</button></div>
   <p class="radar-privacy"><span aria-hidden="true">⌁</span> GPS wird erst nach Zustimmung abgefragt und nicht dauerhaft gespeichert. Für Restaurantentdeckung werden Standortkoordinaten an Overpass/OpenStreetMap übertragen; Kartenkacheln kommen von OpenStreetMap, manuelle Standortsuchen von Nominatim. Deine gespeicherten Spots bleiben lokal. Öffnungszeiten und öffentliche Bewertungen werden noch nicht angeboten.</p>
 </section>
-    <section class="categories-section" id="categorySection"><div class="section-header"><div><div class="overline">01 / WHAT ARE YOU CRAVING?</div><h2>Pick your <em>craving.</em></h2></div><button class="plain-link" id="addCategoryButton">＋ Kategorie erstellen</button></div><div id="categoryTiles" class="category-tiles"></div></section>
-    <section class="rankings-section" id="rankingSection"><div class="section-header"><div><div class="overline">02 / YOUR PERSONAL HALL OF FAME</div><h2>Die <em>Legenden.</em></h2></div><div class="legend">Deine Lieblingsspots auf einen Blick.</div></div><div class="metric-tabs" id="ratingMetricTabs" role="group" aria-label="Ranking nach Bewertung auswählen"><button type="button" class="metric-tab active" data-metric="score" aria-pressed="true"><span aria-hidden="true">★</span> Gesamt</button><button type="button" class="metric-tab" data-metric="valueScore" aria-pressed="false"><span aria-hidden="true">◈</span> Preis-Leistung</button><button type="button" class="metric-tab" data-metric="products" aria-pressed="false"><span aria-hidden="true">🍔</span> Top-Gerichte</button></div><div id="topRated" class="ranking-grid"></div></section>
-    <section class="browse-section" id="browseSection"><div class="section-header browse-title"><div><div class="overline">03 / THE FULL HIT LIST</div><h2>Alle <em>Food-Spots.</em></h2></div><button class="plain-link" id="addSpotSection">＋ Neuen Spot eintragen</button></div>
+    <section class="categories-section" id="categorySection"><div class="section-header"><div><div class="overline">Nach Küche entdecken</div><h2>Worauf hast du Hunger?</h2></div><button class="plain-link" id="addCategoryButton">＋ Kategorie erstellen</button></div><div id="categoryTiles" class="category-tiles"></div></section>
+    <section class="rankings-section" id="rankingSection"><div class="section-header"><div><div class="overline">Deine Bewertungen</div><h2>Deine besten Food-Spots</h2></div><div class="legend">Deine Lieblingsspots auf einen Blick.</div></div><div class="metric-tabs" id="ratingMetricTabs" role="group" aria-label="Ranking nach Bewertung auswählen"><button type="button" class="metric-tab active" data-metric="score" aria-pressed="true"><span aria-hidden="true">★</span> Gesamt</button><button type="button" class="metric-tab" data-metric="valueScore" aria-pressed="false"><span aria-hidden="true">◈</span> Preis-Leistung</button><button type="button" class="metric-tab" data-metric="products" aria-pressed="false"><span aria-hidden="true">🍔</span> Top-Gerichte</button></div><div id="topRated" class="ranking-grid"></div></section>
+    <section class="browse-section" id="browseSection"><div class="section-header browse-title"><div><div class="overline">Deine Sammlung</div><h2>Alle gespeicherten Spots</h2></div><button class="plain-link" id="addSpotSection">＋ Neuen Spot eintragen</button></div>
       <div class="browse-controls"><label class="search-field"><span>⌕</span><input id="searchInput" placeholder="Suche nach einem Food-Spot ..." autocomplete="off" /></label><div class="sort-control"><span class="sort-leading-icon" aria-hidden="true">⇅</span><select id="sortSelect" aria-label="Sortieren"><option value="default">Standardsortierung</option><option value="name">Name A–Z</option><option value="rating">Bester Geschmack</option><option value="value">Beste Preis-Leistung</option><option value="new">Neueste zuerst</option></select><svg class="sort-chevron" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="m7 10 5 5 5-5"/></svg></div></div>
-      <div class="filter-row" id="quickFilters"><button class="filter-pill active" data-filter="all">Alle Spots</button><button class="filter-pill" data-filter="unvisited">Noch offen</button><button class="filter-pill" data-filter="visited">Getestet ✓</button><button class="filter-pill" data-filter="suggested">Neue Vorschläge ✳</button><button class="filter-pill" data-filter="favorite">Favoriten <svg class="heart-svg" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78Z"/></svg></button></div>
-      <div class="result-count"><span id="resultsLabel">93 SPOTS ENTDECKEN</span><span id="categoryFilterName">ALLE KATEGORIEN</span></div><div class="spot-grid" id="spotGrid"></div><div class="empty-state hidden" id="emptyState"><span>🍽️</span><strong>Hier ist noch Platz für guten Geschmack.</strong><p>Kein Spot gefunden. Ändere die Filter oder füge einen neuen hinzu.</p><button id="emptyAdd">＋ Spot hinzufügen</button></div>
+      <div class="filter-row" id="quickFilters"><button class="filter-pill active" data-filter="all">Alle Spots</button><button class="filter-pill" data-filter="unvisited">Noch offen</button><button class="filter-pill" data-filter="visited">Getestet</button><button class="filter-pill" data-filter="suggested">Vorgemerkt</button><button class="filter-pill" data-filter="favorite">Favoriten <svg class="heart-svg" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78Z"/></svg></button></div>
+      <div class="result-count"><span id="resultsLabel">93 Spots</span><span id="categoryFilterName">Alle Kategorien</span></div><div class="spot-grid" id="spotGrid"></div><div class="empty-state hidden" id="emptyState"><span>🍽️</span><strong>Hier ist noch Platz für guten Geschmack.</strong><p>Kein Spot gefunden. Ändere die Filter oder füge einen neuen hinzu.</p><button id="emptyAdd">＋ Spot hinzufügen</button></div>
     </section>
-    <footer>FOOD<span>HUNT.</span><span>FOOD DISCOVERY · BUILT FOR THE NEXT BITE · 2026</span><span>MADE WITH APPETITE ✳</span></footer>
+    <footer>FOOD<span>HUNT.</span><span>Entdecken, merken, wiederkommen</span><span>© 2026 FOODHUNT</span></footer>
   </main>
 </div>
 <nav class="mobile-bottom-nav" aria-label="Mobile Navigation"><button class="mobile-nav-link selected" data-view="home" type="button"><span class="mobile-nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="m3 10 9-7 9 7v10a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1Z"/></svg></span>Home</button><button class="mobile-nav-link" data-view="discover" type="button"><span class="mobile-nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m16 16 5 5"/></svg></span>Entdecken</button><button class="mobile-nav-link" data-view="nearby" type="button"><span class="mobile-nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="2"/><path d="M12 3v3m0 12v3M3 12h3m12 0h3"/><circle cx="12" cy="12" r="8"/></svg></span>Radar</button><button class="mobile-nav-link" data-view="rankings" type="button"><span class="mobile-nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="m12 2 3.2 6.5 7.2 1-5.2 5 .95 7.1L12 18.2 5.85 21.6l.95-7.1-5.2-5 7.2-1Z"/></svg></span>Rankings</button><button class="mobile-nav-link" data-view="visited" type="button"><span class="mobile-nav-icon heart-nav-icon" aria-hidden="true"><svg class="heart-svg" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78Z"/></svg></span>Getestet</button></nav>
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 <div class="modal-backdrop hidden" id="modalBackdrop" role="presentation">
- <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle"><div class="modal-head"><div><div class="overline">FOODHUNT / DEIN FOOD JOURNAL</div><h3 id="modalTitle">Spot hinzufügen</h3><p class="modal-subtitle">Dein nächster Lieblingsbiss – festgehalten.</p></div><button id="closeModal" class="icon-button" aria-label="Schließen">✕</button></div>
+ <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle"><div class="modal-head"><div><div class="overline">Dein Food-Journal</div><h3 id="modalTitle">Spot hinzufügen</h3><p class="modal-subtitle">Dein nächster Lieblingsbiss – festgehalten.</p></div><button id="closeModal" class="icon-button" aria-label="Schließen">✕</button></div>
   <form id="spotForm" class="modal-form review-form">
     <input type="hidden" id="spotId" />
     <section class="review-form-section spot-basics" aria-labelledby="reviewBasicsHeading">

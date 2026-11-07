@@ -6,7 +6,7 @@ void main() {
   testWidgets('home and radar navigation work', (WidgetTester tester) async {
     await tester.pumpWidget(const FoodHuntApp());
     expect(find.text('Was gibt’s Gutes?'), findsOneWidget);
-    expect(find.textContaining('FLUTTER DESIGN-VORSCHAU'), findsOneWidget);
+    expect(find.textContaining('Flutter-Vorschau'), findsOneWidget);
     await tester.tap(find.text('Radar'));
     await tester.pumpAndSettle();
     expect(find.text('Entdecke die Welt um dich.'), findsOneWidget);
