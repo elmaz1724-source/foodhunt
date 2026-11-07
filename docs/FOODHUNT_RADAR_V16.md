@@ -40,6 +40,9 @@ Geolocation accuracy/permissions are browser-specific.
   response for 15 minutes only in memory and within the prior neighborhood.
 - Prefer Leaflet 1.9.4 from jsDelivr, then retry via unpkg. Provide the same
   fallback for its CSS, and invalidate the map size once fallback CSS loads.
+- If **both** public Overpass sources are unavailable, offer an explicit
+  Google Maps restaurant-search link as a user-initiated fallback. Coordinates
+  are only transmitted to Google if the user opens that link.
 - Surface repeated OSM tile errors with a non-blocking warning and an external
   OpenStreetMap link. Error overlay includes a usable external map when the
   library itself cannot load.
@@ -114,3 +117,11 @@ and any errors. This is **not** a measurement at a user's GPS coordinates,
 nor proof of continuous uptime. The workflow treats this probe as non-blocking
 because a shared public API outage should not invalidate deterministic app
 logic tests. Inspect workflow step logs for the real outcome.
+
+### Observed live probe on 2026-11-07
+
+The first GitHub-hosted Chromium-origin live probe did **not** get a POI
+response: `overpass-api.de` returned HTTP 502, and the Private.coffee
+endpoint timed out. Therefore, even a working frontend cannot guarantee
+fresh external restaurants without more reliable service infrastructure.
+The basic map and location UI passed deterministic browser tests.

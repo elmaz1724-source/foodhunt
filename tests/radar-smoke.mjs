@@ -83,6 +83,23 @@ try{
  await manual.screenshot({path:'artifacts/radar-iphone-360-manual.png'});
  console.log('PASS: iPhone 360px — manual city search without geolocation permission');
  await manualContext.close();
+ const offlineContext=await browser.newContext({
+  viewport:{width:390,height:844},deviceScaleFactor:2,
+  geolocation:{latitude:53.4400,longitude:10.3600},
+  permissions:['geolocation']
+ });
+ const offline=await offlineContext.newPage();
+ await setup(offline);
+ await offline.route('https://overpass.private.coffee/api/interpreter?**',route=>route.fulfill({
+  status:503,body:'temporarily unavailable',
+  headers:{'access-control-allow-origin':'*'}
+ }));
+ await offline.locator('.mobile-nav-link[data-view="nearby"]').click();
+ await offline.locator('#radarLocate').click();
+ await offline.locator('#radarExternalSearch').waitFor({state:'visible',timeout:30000});
+ assert.ok((await offline.locator('#radarExternalSearch').getAttribute('href')).startsWith('https://www.google.com/maps/search/'));
+ console.log('PASS: both public providers unavailable — visible external restaurant search fallback');
+ await offlineContext.close();
  assert.equal(errors.length,0,'No page errors expected: '+errors.join(' | '));
  console.log('PASS: Browser runtime reports no uncaught JS errors');
 }catch(error){

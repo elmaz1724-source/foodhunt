@@ -60,6 +60,15 @@ const classify=tags=>{
  return 'street';
 };
 const discoveryStatus=(message,mode='')=>{const e=$('radarDiscoveryStatus');if(e){e.textContent=message;e.dataset.mode=mode}};
+function toggleExternalSearch(show){
+ const link=$('radarExternalSearch');
+ if(!link)return;
+ link.classList.toggle('hidden',!show||!position);
+ if(position){
+  link.href='https://www.google.com/maps/search/?api=1&query='+
+   encodeURIComponent('Restaurants near '+position.lat.toFixed(5)+','+position.lon.toFixed(5));
+ }
+}
 function collectMatches(){
  if(!position)return [];
  const all=getData(),owned=all.filter(marked);
@@ -167,6 +176,7 @@ async function fetchNearby({force=false}={}){
   return;
  }
  if(Date.now()<discoverBackoffUntil){
+  toggleExternalSearch(true);
   discoveryStatus('Die Restaurantdatenquelle ist gerade ausgelastet. Deine gespeicherten Spots bleiben sichtbar. Versuche die Suche später erneut.','warning');
   return;
  }
@@ -177,6 +187,7 @@ async function fetchNearby({force=false}={}){
  discoverLoading=true;
  $('radarRetry').disabled=true;
  const ticket=++requestSerial;
+ toggleExternalSearch(false);
  discoveryStatus('Suche Restaurants in deiner Umgebung …','loading');
  showResults();
  const query=overpassQuery(at.lat,at.lon,target);
@@ -198,10 +209,12 @@ async function fetchNearby({force=false}={}){
   discovered=parseOsmElements(result);
   lastDiscovery={lat:at.lat,lon:at.lon,radius:target,time:Date.now()};
   const cap=radius()>5?' Die öffentliche Suche ist vorerst auf 5 km begrenzt; eigene Spots werden bis zum gewählten Umkreis berücksichtigt.':'';
+  toggleExternalSearch(false);
   discoveryStatus(discovered.length+' Restaurants aus OpenStreetMap geladen. Diese Spots haben noch keine FOODHUNT-Community-Bewertungen.'+cap,'success');
  }catch(e){
   if(ticket!==requestSerial)return;
   discoverBackoffUntil=Date.now()+30000;
+  toggleExternalSearch(true);
   discoveryStatus((e?.name==='AbortError'?'Die Suche hat zu lange gedauert.':'Restaurantdaten gerade nicht verfügbar.')+
    ' Prüfe deine Verbindung oder tippe später auf „Erneut suchen“. Deine gespeicherten Spots bleiben sichtbar.','warning');
  }finally{
