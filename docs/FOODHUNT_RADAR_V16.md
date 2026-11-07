@@ -104,3 +104,13 @@ References:
 - No public user ratings, live hours, or universal photos are claimed.
 - When the product scales, move query orchestration, provider reliability,
   caching, and monitoring into a controlled backend.
+
+## Live provider CORS probe
+
+The optional `tests/radar-live-probe.mjs` makes one small, browser-origin
+Overpass request near an illustrative Geesthacht city-centre coordinate.
+It attempts a second provider only if the first fails and logs the count
+and any errors. This is **not** a measurement at a user's GPS coordinates,
+nor proof of continuous uptime. The workflow treats this probe as non-blocking
+because a shared public API outage should not invalidate deterministic app
+logic tests. Inspect workflow step logs for the real outcome.

@@ -8,6 +8,7 @@ on:
       - "v10.js"
       - "v16.css"
       - "tests/radar-smoke.mjs"
+      - "tests/radar-live-probe.mjs"
       - ".github/workflows/radar-smoke.yml"
   workflow_dispatch:
 jobs:
@@ -32,6 +33,9 @@ jobs:
           exit 1
       - name: Test GPS, API failover and manual city search in Chromium
         run: node tests/radar-smoke.mjs
+      - name: Probe public Overpass availability from browser (non-blocking)
+        continue-on-error: true
+        run: node tests/radar-live-probe.mjs
       - name: Attach screenshots
         if: always()
         uses: actions/upload-artifact@v4
