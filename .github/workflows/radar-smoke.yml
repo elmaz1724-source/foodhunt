@@ -7,6 +7,9 @@ on:
       - "app.js"
       - "v10.js"
       - "v16.css"
+      - "v17.css"
+      - "google-radar.js"
+      - "tests/google-radar-smoke.mjs"
       - "tests/radar-smoke.mjs"
       - "tests/radar-live-probe.mjs"
       - ".github/workflows/radar-smoke.yml"
@@ -33,6 +36,8 @@ jobs:
           exit 1
       - name: Test GPS, API failover and manual city search in Chromium
         run: node tests/radar-smoke.mjs
+      - name: Test Google Maps Embed adapter and fallback (mocked API)
+        run: node tests/google-radar-smoke.mjs
       - name: Probe public Overpass availability from browser (non-blocking)
         continue-on-error: true
         run: node tests/radar-live-probe.mjs

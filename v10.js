@@ -341,7 +341,7 @@ async function displayMap(matches){
 }
 function renderAll(){
  const matches=showResults();
- if(position)displayMap(matches);
+ if(position&&!window.FOODHUNT_GOOGLE_RADAR?.isActive?.())displayMap(matches);
 }
 function getGps(cb){
  if(!window.isSecureContext||!navigator.geolocation){$('radarLocate').disabled=false;status('Standortfreigabe ist hier nicht möglich. Öffne FOODHUNT über HTTPS und aktiviere die Standortdienste.','warning');return}
@@ -363,8 +363,9 @@ $('radarLocate').addEventListener('click',()=>{
   $('radarRetry').disabled=false;
   b.disabled=false;b.innerHTML='<span aria-hidden="true">◎</span> Standort aktualisieren';
   status('Standort erkannt · Genauigkeit etwa '+Math.round(p.accuracy)+' m. '+(p.accuracy>500?'Die Position ist ungenau; alternativ kannst du unten einen Ort suchen. ':'')+'Wir suchen neue Restaurants in der Umgebung.','success');
+  document.dispatchEvent(new Event('foodhunt:radar-position'));
   renderAll();
-  fetchNearby({force:discoverLoading});
+  if(!window.FOODHUNT_GOOGLE_RADAR?.isActive?.())fetchNearby({force:discoverLoading});
  });
 });
 $('radarPlaceForm').addEventListener('submit',async(event)=>{
@@ -401,8 +402,9 @@ $('radarPlaceForm').addEventListener('submit',async(event)=>{
   }
   $('radarRetry').disabled=false;
   status('Suchort: '+String(place.display_name||search).slice(0,110)+'. Das ist ein ausgewählter Ort, nicht dein GPS-Standort.','success');
+  document.dispatchEvent(new Event('foodhunt:radar-position'));
   renderAll();
-  fetchNearby({force:discoverLoading});
+  if(!window.FOODHUNT_GOOGLE_RADAR?.isActive?.())fetchNearby({force:discoverLoading});
  }catch(error){
   status(error?.message||'Ort konnte nicht gesucht werden.','warning');
  }finally{
@@ -411,7 +413,7 @@ $('radarPlaceForm').addEventListener('submit',async(event)=>{
  }
 });
 for(const id of ['radarSort','radarCategory','radarSource'])$(id).addEventListener('change',renderAll);
-$('radarRadius').addEventListener('change',()=>{renderAll();if(position)fetchNearby({force:discoverLoading});});
+$('radarRadius').addEventListener('change',()=>{renderAll();if(position&&!window.FOODHUNT_GOOGLE_RADAR?.isActive?.())fetchNearby({force:discoverLoading});});
 $('radarResults').addEventListener('click',e=>{
  const spot=e.target.closest('[data-radar-spot]');
  if(spot){window.FOODHUNT_API.openSpot(spot.dataset.radarSpot);return;}
@@ -530,8 +532,14 @@ document.addEventListener('foodhunt:spot-form-opened',()=>{
 });
 document.addEventListener('foodhunt:datachange',renderAll);
 document.addEventListener('foodhunt:radar-open',()=>{
- if(position){renderAll();fetchNearby();}else available();
+ if(position){renderAll();if(!window.FOODHUNT_GOOGLE_RADAR?.isActive?.())fetchNearby();}else available();
 });
+window.FOODHUNT_RADAR={
+ getPosition:()=>position?{lat:position.lat,lon:position.lon,manual:!!position.manual}:null,
+ getRadius:radius,
+ getCategory:()=>String($('radarCategory').value||''),
+ refresh:()=>renderAll()
+};
 available();
 showResults();
 })();

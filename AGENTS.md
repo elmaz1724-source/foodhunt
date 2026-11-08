@@ -125,3 +125,32 @@ model without cloning Instagram, TikTok, YouTube or delivery-service trade dress
 Reference: Nielsen Norman Group's Jakob's Law explanation, and Apple HIG tab
 bar guidance. The five patterns circulating on social media are not formal
 five rules from Jakob's Law. Details: `docs/FOODHUNT_NAVIGATION_V15.md`.
+
+## Google Maps in FOODHUNT Radar — V17
+
+Use the official **Google Maps Embed API** in `google-radar.js` for
+Google's search map; retain the FOODHUNT/Leaflet map as the fallback.
+A Google Cloud project, billing account and a restricted **Maps Embed API**
+browser key are required for in-app embedding. Do not invent or hardcode
+credentials into this public repository.
+
+The in-app Google map is a **Google-owned iframe**. Never scrape Google
+listings, ratings, photos or reviews from it; never label them as FOODHUNT
+community scores. The custom FOODHUNT ratings and OSM cards are separate.
+For EEA billing accounts after 2025-07-08, the usual Places API content
+must not be freely displayed with any map; use the official Places UI Kit
+for future interactive Google listings instead of manually copying data.
+Google's free Maps Embed SKU does not eliminate billing/project setup.
+
+`google-radar.js` accepts a locally stored, appropriately restricted browser
+key for the user's *own test device*. For production, provide a
+referrer-restricted project key through a managed deployment configuration.
+Never commit unrestricted keys or Google content to source.
+Without a valid key, show the setup instructions and retain the working
+existing map plus a no-key external Google Maps search URL.
+
+Test the provider switch, manual/GPS location, category/zoom, key
+save/delete, no unwanted Overpass calls in Google mode, and the OSM fallback.
+The Google iframe cannot be programmatically inspected for third-party
+place data or guaranteed to report billing/auth failures via onload.
+Read `docs/FOODHUNT_GOOGLE_RADAR_V17.md` before modifications.

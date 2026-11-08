@@ -1,0 +1,158 @@
+/* FOODHUNT V17 — Google Maps Embed adapter
+   Google UI and its attribution are kept intact within the official iframe.
+   Own FOODHUNT scores are never labeled as Google ratings. */
+.radar-provider-toolbar{
+  display:flex;align-items:center;justify-content:space-between;
+  gap:12px;flex-wrap:wrap;margin:2px 0 13px;
+}
+.radar-provider-choices{
+  display:inline-flex;align-items:stretch;gap:3px;
+  padding:4px;border:1px solid var(--v3-border);
+  border-radius:15px;background:var(--surface-2);
+}
+.radar-provider-button{
+  min-height:41px;padding:10px 15px;
+  border:none;border-radius:11px;background:transparent;
+  color:var(--ink-soft);
+  font:600 12px/1.3 'DM Sans',system-ui,sans-serif;
+  cursor:pointer;
+}
+.radar-provider-button.selected{
+  background:var(--surface);color:var(--ink);
+  box-shadow:0 1px 4px rgba(0,0,0,.07);
+}
+.radar-open-google{
+  display:inline-flex;align-items:center;justify-content:center;
+  min-height:43px;gap:5px;padding:10px 13px;
+  border:1px solid var(--v3-border);
+  border-radius:12px;background:var(--surface);
+  color:var(--accent-strong);
+  font:600 12px/1.3 'DM Sans',system-ui,sans-serif;
+  text-decoration:none;
+}
+.radar-provider-button:focus-visible,.radar-open-google:focus-visible{
+  outline:3px solid var(--accent-strong);outline-offset:3px;
+}
+.radar-map-shell{position:relative}
+.radar-google-wrap{
+  display:flex;flex-direction:column;width:100%;
+  min-height:440px;
+  background:var(--surface);
+}
+.radar-google-wrap.hidden,.radar-google-setup.hidden,.radar-google-remove.hidden{
+  display:none!important;
+}
+.radar-google-wrap iframe{
+  display:block;flex:1 1 auto;
+  height:395px;min-height:395px;width:100%;
+  border:0;background:#e7e8e6;
+}
+.radar-google-caption{
+  display:flex;align-items:center;gap:9px;flex-wrap:wrap;
+  padding:11px 13px;border-top:1px solid var(--v3-border);
+  font:500 11px/1.45 'DM Sans',system-ui,sans-serif;
+  background:var(--surface);
+  color:var(--muted);
+}
+.radar-google-caption button{
+  margin-left:auto;min-height:34px;padding:7px 10px;
+  border:1px solid var(--v3-border);border-radius:10px;
+  background:var(--surface-2);color:var(--ink);
+  font:600 11px/1.35 'DM Sans',system-ui,sans-serif;
+}
+#radarGoogleFrameStatus:not(:empty){color:var(--accent-strong)}
+.radar-google-setup{
+  position:absolute;inset:0;z-index:850;
+  overflow-y:auto;
+  display:flex;flex-direction:column;gap:10px;
+  padding:21px;
+  background:var(--surface);
+  color:var(--ink);
+  border-radius:inherit;
+  overscroll-behavior:contain;
+}
+.radar-google-setup-header{
+  display:flex;align-items:center;gap:10px;
+}
+.radar-google-setup-header>span{
+  display:grid;place-items:center;width:39px;height:39px;
+  border-radius:12px;background:var(--surface-2);color:var(--accent-strong);
+  font-size:23px;
+}
+.radar-google-setup-header strong{
+  font:600 19px/1.3 'DM Sans',system-ui,sans-serif;
+}
+.radar-google-setup p{
+  margin:0;color:var(--muted);
+  font:400 12px/1.5 'DM Sans',system-ui,sans-serif;
+}
+.radar-google-setup form{
+  display:flex;flex-direction:column;gap:9px;
+}
+.radar-google-setup label{
+  color:var(--ink);font:600 12px/1.3 'DM Sans',system-ui,sans-serif;
+}
+.radar-google-setup input{
+  width:100%;min-height:47px;min-width:0;
+  padding:11px 13px;
+  border:1px solid var(--v3-border);
+  border-radius:12px;
+  background:var(--surface-2);color:var(--ink);
+  font:500 16px/1.4 'DM Sans',system-ui,sans-serif;
+}
+.radar-google-setup-actions{
+  display:flex;gap:9px;flex-wrap:wrap;margin:2px 0 0;
+}
+.radar-google-setup-actions button{
+  min-height:43px;padding:10px 14px;
+  border-radius:12px;font:600 12px/1.3 'DM Sans',system-ui,sans-serif;
+}
+#radarGoogleSave{
+  background:var(--ink);border:1px solid var(--ink);color:var(--bg);
+}
+#radarGoogleCancel{
+  background:var(--surface-2);border:1px solid var(--v3-border);
+  color:var(--ink);
+}
+.radar-google-setup>a{
+  color:var(--accent-strong);
+  font:600 12px/1.5 'DM Sans',system-ui,sans-serif;
+  text-decoration:underline;text-underline-offset:3px;
+}
+.radar-google-remove{
+  margin-right:auto;padding:6px 0;
+  border:none;background:transparent;
+  color:var(--accent-strong);
+  font:500 12px/1.4 'DM Sans',system-ui,sans-serif;
+  text-align:left;
+}
+#radarGoogleSetupStatus{color:var(--accent-strong)}
+.radar-google-active .radar-body{grid-template-columns:minmax(0,1fr)}
+.radar-google-active .radar-map{display:none}
+.radar-google-active .radar-map-caption,
+.radar-google-active .radar-map-warning,
+.radar-google-active .radar-results-panel,
+.radar-google-active .radar-enrich{display:none!important}
+.radar-google-active .radar-controls .radar-sort,
+.radar-google-active .radar-controls .radar-source{display:none}
+.radar-google-active .radar-map-shell{min-height:440px}
+@media(max-width:720px){
+  .radar-provider-toolbar{gap:10px;align-items:stretch}
+  .radar-provider-choices{flex:1;justify-content:stretch}
+  .radar-provider-button{flex:1;padding:10px 8px;font-size:12px}
+  .radar-open-google{flex:1 1 100%;min-height:43px}
+  .radar-google-wrap iframe{height:340px;min-height:340px}
+  .radar-google-wrap{min-height:390px}
+  .radar-google-active .radar-map-shell{min-height:390px}
+  .radar-google-setup{padding:17px}
+  .radar-google-caption{padding:10px 12px;font-size:11px}
+  .radar-google-caption button{margin-left:0}
+}
+@media(max-width:375px){
+  .radar-provider-button{font-size:11px;padding:9px 7px}
+  .radar-google-setup-actions button{flex:1}
+}
+@media(prefers-reduced-motion:reduce){
+  .radar-provider-button,.radar-open-google,
+  .radar-google-setup-actions button{transition:none!important}
+}

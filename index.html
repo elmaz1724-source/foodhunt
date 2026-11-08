@@ -33,6 +33,7 @@
   <link rel="stylesheet" href="v14.css" />
   <link rel="stylesheet" href="v15.css" />
   <link rel="stylesheet" href="v16.css" />
+  <link rel="stylesheet" href="v17.css" />
   <script defer src="seed.js"></script>
   <script defer src="app.js"></script>
   <script defer src="theme.js"></script>
@@ -40,6 +41,7 @@
   <script defer src="v8.js"></script>
   <script defer src="v9.js"></script>
   <script defer src="v10.js"></script>
+  <script defer src="google-radar.js"></script>
   <script defer src="v14.js"></script>
   <script>
     if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.hostname === 'localhost')) {
@@ -115,9 +117,40 @@
   </div>
   <form id="radarPlaceForm" class="radar-place-form" autocomplete="off"><label for="radarPlaceInput">Oder suche ohne GPS</label><div class="radar-place-row"><input id="radarPlaceInput" name="place" type="search" maxlength="120" placeholder="Stadt, Ort oder Postleitzahl" aria-label="Stadt oder Ort suchen" /><button id="radarPlaceSearch" type="submit">Ort suchen</button></div></form>
   <p id="radarStatus" class="radar-status" role="status" aria-live="polite">Erlaube deinen Standort, um deine Spots und neue Restaurants aus OpenStreetMap zu entdecken. Für die Suche wird dein Standort an einen Kartendienst übertragen; FOODHUNT speichert ihn nicht dauerhaft.</p>
+  <div class="radar-provider-toolbar">
+    <div class="radar-provider-choices" role="group" aria-label="Kartenanbieter">
+      <button id="radarProviderFoodhunt" type="button" class="radar-provider-button selected" aria-pressed="true">FOODHUNT-Karte</button>
+      <button id="radarProviderGoogle" type="button" class="radar-provider-button" aria-pressed="false">Google Maps</button>
+    </div>
+    <a id="radarGoogleOpen" class="radar-open-google" href="https://www.google.com/maps/search/?api=1&amp;query=Restaurants" target="_blank" rel="noopener noreferrer">In Google Maps öffnen ↗</a>
+  </div>
   <div class="radar-body">
     <div class="radar-map-shell">
       <div id="radarMap" class="radar-map" role="region" aria-label="Karte mit deinen FOODHUNT-Spots"></div>
+      <div id="radarGoogleWrap" class="radar-google-wrap hidden">
+        <iframe id="radarGoogleIframe" title="Google Maps – Restaurants in der Nähe" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+        <div class="radar-google-caption">
+          Google zeigt seine eigene Restaurantsuche. Deine FOODHUNT-Noten werden nicht mit Google-Bewertungen vermischt.
+          <button id="radarGoogleSettings" type="button">Google-Zugang ändern</button>
+          <span id="radarGoogleFrameStatus" role="status" aria-live="polite"></span>
+        </div>
+      </div>
+      <div id="radarGoogleSetup" class="radar-google-setup hidden">
+        <div class="radar-google-setup-header"><span aria-hidden="true">⌖</span><strong>Google Maps im Radar</strong></div>
+        <p>Die Einbettung braucht einen Google-Cloud-Browser-Schlüssel für die <strong>Maps Embed API</strong>. Ohne Schlüssel kannst du Google Maps sofort extern öffnen.</p>
+        <form id="radarGoogleKeyForm" autocomplete="off">
+          <label for="radarGoogleKeyInput">Eingeschränkter API-Schlüssel</label>
+          <input id="radarGoogleKeyInput" type="password" placeholder="AIza…" spellcheck="false" autocapitalize="off" autocomplete="off" aria-describedby="radarGoogleKeyHint" />
+          <p id="radarGoogleKeyHint">Nur einen Schlüssel verwenden, der auf diese Website und ausschließlich die Maps Embed API beschränkt ist. Er wird in diesem Browser gespeichert, nicht auf GitHub.</p>
+          <div class="radar-google-setup-actions">
+            <button type="submit" id="radarGoogleSave">Google Maps aktivieren</button>
+            <button type="button" id="radarGoogleCancel">Abbrechen</button>
+          </div>
+          <button type="button" id="radarGoogleKeyRemove" class="radar-google-remove hidden">Gespeicherten Schlüssel entfernen</button>
+        </form>
+        <a href="https://console.cloud.google.com/google/maps-apis/credentials" target="_blank" rel="noopener noreferrer">API-Schlüssel in Google Cloud einrichten ↗</a>
+        <p id="radarGoogleSetupStatus" role="status" aria-live="polite"></p>
+      </div>
       <div id="radarMapCover" class="radar-map-cover"><svg class="radar-empty-icon" viewBox="0 0 24 24" width="48" height="48" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m3 6 6-3 6 3 6-3v15l-6 3-6-3-6 3V6z"/><path d="M9 3v15M15 6v15"/></svg><strong>Dein Food-Radar</strong><p>Die Karte startet, sobald du deinen Standort freigibst.</p></div>
       <div id="radarMapWarning" class="radar-map-warning hidden" role="status" aria-live="polite">Kartenkacheln können nicht geladen werden. <a id="radarExternalMap" href="https://www.openstreetmap.org/" target="_blank" rel="noopener noreferrer">Karte extern öffnen</a></div>
       <div class="radar-map-caption">Kartendaten © OpenStreetMap-Mitwirkende · <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer">Lizenz</a></div>
@@ -129,7 +162,7 @@
     </div>
   </div>
   <div class="radar-enrich"><div><strong>Deine Restaurants auf die Karte bringen</strong><p id="radarMissingInfo">Noch keine Restaurants mit verifiziertem Standort.</p></div><button type="button" id="radarAssignSpot">Standort ergänzen ↗</button></div>
-  <p class="radar-privacy"><span aria-hidden="true">⌁</span> GPS wird nur nach Zustimmung abgefragt und nicht dauerhaft gespeichert. Auch bei einer Ortssuche werden die ausgewählten Koordinaten für die Restaurantentdeckung an öffentliche Overpass-Dienste übertragen. Die Ortssuche nutzt Nominatim, Kartenkacheln OpenStreetMap. Deine Bewertungen bleiben lokal. Öffnungszeiten und öffentliche Bewertungen werden nicht angezeigt.</p>
+  <p class="radar-privacy"><span aria-hidden="true">⌁</span> GPS wird nur nach Zustimmung abgefragt und nicht dauerhaft gespeichert. Bei Nutzung der FOODHUNT-Karte werden Suchkoordinaten an öffentliche Overpass-Dienste übermittelt; bei Google Maps lädt die eingebettete Google-Karte die gewählte Umgebung. Die manuelle Ortssuche nutzt weiterhin Nominatim. Deine eigenen Bewertungen bleiben lokal und getrennt von Google.</p>
 </section>
     <section class="categories-section" id="categorySection"><div class="section-header"><div><div class="overline">Nach Küche entdecken</div><h2>Worauf hast du Hunger?</h2></div><button class="plain-link" id="addCategoryButton">＋ Kategorie erstellen</button></div><div id="categoryTiles" class="category-tiles"></div></section>
     <section class="rankings-section" id="rankingSection"><div class="section-header"><div><div class="overline">Deine Bewertungen</div><h2>Deine besten Food-Spots</h2></div><div class="legend">Deine Lieblingsspots auf einen Blick.</div></div><div class="metric-tabs" id="ratingMetricTabs" role="group" aria-label="Ranking nach Bewertung auswählen"><button type="button" class="metric-tab active" data-metric="score" aria-pressed="true"><span aria-hidden="true">★</span> Gesamt</button><button type="button" class="metric-tab" data-metric="valueScore" aria-pressed="false"><span aria-hidden="true">◈</span> Preis-Leistung</button><button type="button" class="metric-tab" data-metric="products" aria-pressed="false"><span aria-hidden="true">🍔</span> Top-Gerichte</button></div><div id="topRated" class="ranking-grid"></div></section>
