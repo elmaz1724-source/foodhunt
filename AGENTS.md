@@ -42,7 +42,7 @@ them silently.
 
 ## Emil Kowalski skills (project-local, Codex)
 
-All **17** upstream skills from
+All **18** upstream skills from
 `https://github.com/emilkowalski/skills` are vendored under
 `.agents/skills/<skill-name>/SKILL.md`, together with their companion
 `RECIPES.md`, `AUDIT.md`, `STANDARDS.md`, `CATALOG.md`, `PICKER.md`,
@@ -154,3 +154,75 @@ save/delete, no unwanted Overpass calls in Google mode, and the OSM fallback.
 The Google iframe cannot be programmatically inspected for third-party
 place data or guaranteed to report billing/auth failures via onload.
 Read `docs/FOODHUNT_GOOGLE_RADAR_V17.md` before modifications.
+
+## Unified UI/UX workflow — V18 (2026-11-08)
+
+**Scope:** FOODHUNT production is still vanilla HTML/CSS/JavaScript on GitHub
+Pages; Flutter under `flutter_mobile/` is a separate, unfinished starter.
+Preserve all restaurant IDs, stored user scores, per-dish reviews, favorites,
+map provenance, backup formats, localStorage keys and the existing mobile
+navigation. No uncontrolled migration or runtime dependency changes.
+
+### Installed, project-local Codex skills
+
+- `frontend-design`: Anthropic's distinctive visual direction and
+  typography choices (Apache-2.0).
+- `web-design-guidelines`: Vercel's accessibility, forms, performance,
+  navigation and motion audit; it must fetch the current upstream checklist
+  before review. A dated offline snapshot lives at
+  `docs/skills/vercel-web-guidelines-snapshot.md` (not a substitute when
+  internet is available).
+- `ui-ux-pro-max`: NextLevelBuilder's search-driven UX/typography/style
+  reference with Python scripts and local data (MIT). It suggests options;
+  FOODHUNT's established soft-discovery identity always takes precedence.
+- `gestures`: Emil Kowalski's new touch/swipe motion skill; only apply to
+  intentional new gestures, not Safari's native Back or map panning.
+- Emil's previous 17 skills and `unslop` remain installed.
+
+**Choose a narrow skill set based on the task**:
+
+| Work | Preferred skills | Explicit non-goal |
+| --- | --- | --- |
+| Overall brand, hierarchy, visual design | `frontend-design` + `emil-design-eng` | Generic templates, borrowed delivery branding |
+| Design tokens, typography, visual alternatives | `ui-ux-pro-max` + `frontend-design` | Automatically imposing suggested palettes |
+| Accessibility, responsive QA, browser audit | `web-design-guidelines` + `break-ui` | Claiming an audit without browser evidence |
+| Mobile PWA input, keyboard, touch and safe areas | `mobile-native` + `break-ui` | Native-only gestures without an alternative |
+| Performance, jank and interaction motion | `animation-performance`, optionally `review-animations` | Installing animation packages preemptively |
+| Deliberate drag/sheet gestures | `gestures` + `pick-ui-library` | Overriding system Back/pull-to-refresh |
+| Detect unneeded decoration | `unslop` | Removing meaningful food imagery/content |
+| React/Next migration, **only if adopted** | Vercel `react-best-practices` | Applying React rules to vanilla JS or Flutter |
+
+### Components, not Codex skills
+
+- shadcn/ui: React-oriented, Tailwind-compatible source components;
+  do not install into the current vanilla web app.
+- Magic UI: largely React/Tailwind motion components; optional only for
+  a demonstrated need after a stack change.
+- Motion Primitives: React + Motion + Tailwind primitives, currently beta;
+  avoid introducing it for cosmetic effects.
+
+Use official source guidance for reference, never commit a dependency only
+because a demo looks polished. Document license and bundle/performance impact
+before proposing integration.
+
+### Repeatable quality gate
+
+1. Review `docs/FOODHUNT_UI_WORKFLOW_V18.md` and existing design decisions.
+2. Identify top user-facing friction and prioritize accessibility, search,
+   touch targets, perceived speed, content clarity and honest data first.
+3. For Vercel review fetch the latest guidelines:
+   `https://raw.githubusercontent.com/vercel-labs/web-interface-guidelines/main/command.md`.
+4. Check 360, 390 and 1440px widths with browser runtime when available,
+   dark/light, search, modal/focus, provider selector and local saved data.
+5. Confirm reduced motion and keyboard focus; never hide platform focus rings
+   without replacement. Respect native Safari gestures.
+6. Avoid `transition: all`, layout-changing animation and low-contrast
+   placeholder-only forms; prefer short transform/opacity feedback.
+7. Run `tests/ui-quality-smoke.mjs` and existing Radar smoke tests in
+   GitHub Actions, inspect failures, then fix and re-test.
+8. Bump service-worker cache when shipping assets. Document partial coverage:
+   Chromium emulation is **not** real iPhone Safari/VoiceOver verification.
+
+Manual installation through the connected GitHub API is project-local.
+It is **not** proof that `npx skills` or `uipro init --ai codex` ran on the
+user's own device. See the install/audit report for details.

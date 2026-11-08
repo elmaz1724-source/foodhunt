@@ -34,6 +34,7 @@
   <link rel="stylesheet" href="v15.css" />
   <link rel="stylesheet" href="v16.css" />
   <link rel="stylesheet" href="v17.css" />
+  <link rel="stylesheet" href="v18.css" />
   <script defer src="seed.js"></script>
   <script defer src="app.js"></script>
   <script defer src="theme.js"></script>
@@ -50,6 +51,7 @@
   </script>
 </head>
 <body>
+<a class="skip-to-content" href="#home">Zum Inhalt springen</a>
 <div class="mobile-topbar"><a class="logo" href="#home" data-view="home" aria-label="FOODHUNT Startseite">FOOD<span>HUNT.</span><span class="logo-star">✳</span></a><div class="mobile-top-actions"><button class="mobile-top-search" type="button" data-view="discover" aria-label="Food-Spots suchen"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.85" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m16 16 5 5"/></svg></button></div></div>
 <div class="app-shell">
   <aside class="sidebar">
@@ -73,7 +75,7 @@
       <button class="side-backup" id="backupButton">⇩ &nbsp;Daten sichern / laden</button>
     </div>
   </aside>
-  <main id="home" class="content">
+  <main id="home" class="content" tabindex="-1">
     <header class="topbar">
       <div class="location"><span class="live-dot"></span> FOODHUNT <span class="location-muted">/ DEIN FOODKOMPASS</span></div>
       <div class="top-actions"><span class="today-date" id="todayDate"></span><button class="add-button" id="addSpotTop"><span>＋</span> Spot hinzufügen</button></div>
@@ -87,7 +89,7 @@
         <div class="hero-scribble">GOOD FOOD. GREAT MEMORIES. <span aria-hidden="true">✳</span></div>
       </div>
       <div class="hero-photo" role="img" aria-label="Food Fotografie von einem Burger">
-        <div class="hero-fallback" aria-hidden="true">🍔</div><img class="hero-real-photo" src="https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=1100&amp;q=85&amp;fit=crop" alt="" onerror="this.style.display='none'" /><div class="hero-photo-shade"></div><span class="hero-photo-tag"><span class="hero-photo-tag-top">FOODHUNT</span><strong>FH.</strong><span class="hero-photo-tag-bottom">EAT LOCAL ↗</span></span><span class="hero-photo-label">CURATED WITH APPETITE ✳</span>
+        <div class="hero-fallback" aria-hidden="true">🍔</div><img class="hero-real-photo" src="https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=1100&amp;q=85&amp;fit=crop" alt="" width="1100" height="825" decoding="async" fetchpriority="high" onerror="this.style.display='none'" /><div class="hero-photo-shade"></div><span class="hero-photo-tag"><span class="hero-photo-tag-top">FOODHUNT</span><strong>FH.</strong><span class="hero-photo-tag-bottom">EAT LOCAL ↗</span></span><span class="hero-photo-label">CURATED WITH APPETITE ✳</span>
       </div>
     </section>
     <div class="soft-discover-strip" aria-label="FOODHUNT Entscheidungshilfe">
@@ -169,7 +171,7 @@
     <section class="browse-section" id="browseSection"><div class="section-header browse-title"><div><div class="overline">Deine Sammlung</div><h2>Alle gespeicherten Spots</h2></div><button class="plain-link" id="addSpotSection">＋ Neuen Spot eintragen</button></div>
       <div class="browse-controls"><label class="search-field"><span aria-hidden="true">⌕</span><input id="searchInput" type="search" inputmode="search" enterkeyhint="search" aria-label="Food-Spots durchsuchen" placeholder="Food-Spots suchen" autocomplete="off" /></label><div class="sort-control"><span class="sort-leading-icon" aria-hidden="true">⇅</span><select id="sortSelect" aria-label="Sortieren"><option value="default">Standardsortierung</option><option value="name">Name A–Z</option><option value="rating">Bester Geschmack</option><option value="value">Beste Preis-Leistung</option><option value="new">Neueste zuerst</option></select><svg class="sort-chevron" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="m7 10 5 5 5-5"/></svg></div></div>
       <div class="filter-row" id="quickFilters"><button class="filter-pill active" data-filter="all">Alle Spots</button><button class="filter-pill" data-filter="unvisited">Noch offen</button><button class="filter-pill" data-filter="visited">Getestet</button><button class="filter-pill" data-filter="suggested">Vorgemerkt</button><button class="filter-pill" data-filter="favorite">Favoriten <svg class="heart-svg" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78Z"/></svg></button></div>
-      <div class="result-count"><span id="resultsLabel">93 Spots</span><span id="categoryFilterName">Alle Kategorien</span></div><div class="spot-grid" id="spotGrid"></div><div class="empty-state hidden" id="emptyState"><span>🍽️</span><strong>Hier ist noch Platz für guten Geschmack.</strong><p>Kein Spot gefunden. Ändere die Filter oder füge einen neuen hinzu.</p><button id="emptyAdd">＋ Spot hinzufügen</button></div>
+      <div class="result-count"><span id="resultsLabel" role="status" aria-live="polite" aria-atomic="true">93 Spots</span><span id="categoryFilterName">Alle Kategorien</span></div><div class="spot-grid" id="spotGrid"></div><div class="empty-state hidden" id="emptyState"><span>🍽️</span><strong>Hier ist noch Platz für guten Geschmack.</strong><p>Kein Spot gefunden. Ändere die Filter oder füge einen neuen hinzu.</p><button id="emptyAdd">＋ Spot hinzufügen</button></div>
     </section>
     <section class="profile-section" id="profileSection" aria-labelledby="profileHeading">
       <header class="profile-heading">

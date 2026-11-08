@@ -1,0 +1,68 @@
+name: FOODHUNT UI quality and Codex skills
+on:
+  push:
+    branches: [main]
+    paths:
+      - "index.html"
+      - "app.js"
+      - "v18.css"
+      - "sw.js"
+      - ".agents/skills/**"
+      - "AGENTS.md"
+      - "tests/ui-quality-smoke.mjs"
+      - ".github/workflows/ui-quality.yml"
+  workflow_dispatch:
+jobs:
+  skill-integrity:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check project-local skill entry points and data
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          root=Path(".agents/skills")
+          names=["unslop","emil-design-eng","gestures","frontend-design","web-design-guidelines","ui-ux-pro-max"]
+          for name in names:
+              path=root/name/"SKILL.md"
+              assert path.is_file(), f"Missing: {path}"
+              text=path.read_text(encoding="utf-8")
+              assert text.startswith("---\n"), f"Invalid SKILL.md frontmatter: {path}"
+              print("PASS:",path)
+          pro=root/"ui-ux-pro-max"
+          for p in ("scripts/search.py","scripts/core.py","scripts/design_system.py","data/styles.csv","data/ux-guidelines.csv","data/stacks/flutter.csv","data/stacks/html-tailwind.csv","references/pro-rules.md"):
+              assert (pro/p).is_file(),f"Missing UUPM dependency {p}"
+          print("PASS: UI UX Pro Max Python/data dependencies present")
+          PY
+      - name: Run UI UX Pro Max search from its installed directory
+        run: python3 .agents/skills/ui-ux-pro-max/scripts/search.py "mobile restaurant discovery" --domain ux -n 3
+  browser:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Install browser test dependency (CI only)
+        run: npm install --no-save playwright@1.56.1
+      - run: npx playwright install --with-deps chromium
+      - name: Serve static site locally
+        run: |
+          python3 -m http.server 4173 --bind 127.0.0.1 > /tmp/foodhunt-ui-server.log 2>&1 &
+          for i in $(seq 1 30); do
+            if curl -fsS http://127.0.0.1:4173/ >/dev/null; then exit 0; fi
+            sleep 1
+          done
+          exit 1
+      - name: Test desktop and mobile UX
+        run: node tests/ui-quality-smoke.mjs
+      - name: Save viewport screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: foodhunt-ui-v18-screenshots
+          path: artifacts/
+          if-no-files-found: ignore
+          retention-days: 10
